@@ -46,7 +46,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.ACCESSKEY_ID }}
         aws-secret-access-key: ${{ secrets.ACCESSKEY_SECRET_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: ${{ env.ap-northeast-2 }}
 
     # (5) 빌드 결과물을 S3 버킷에 업로드
     - name: Upload to AWS S3
