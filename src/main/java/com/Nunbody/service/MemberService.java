@@ -2,13 +2,14 @@ package com.Nunbody.service;
 
 import com.Nunbody.domain.Member;
 import com.Nunbody.domain.MemeberRepository;
-import com.Nunbody.dto.MemberRegisterResponseDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MemberService {
+    @Autowired
     private MemeberRepository memberRepository;
-    public MemberRegisterResponseDto register(Member resource) {
+    public void register(Member resource) {
         Member member;
         if(resource.isHasNaver()&& resource.isHasGmail()) {
             member = Member.builder()
@@ -43,10 +44,8 @@ public class MemberService {
                     .name(resource.getName()).build();
         }
         memberRepository.save(member);
-        MemberRegisterResponseDto memberRegisterResponseDto = MemberRegisterResponseDto.builder()
-                .email(member.getEmail())
-                .name(member.getName())
-                .build();
-        return memberRegisterResponseDto;
+
+
+        //return memberRegisterResponseDto;
     }
 }
