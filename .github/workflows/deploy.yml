@@ -43,7 +43,6 @@ jobs:
     - name: 🍀 application.yml 설정
       run: |
         cd ./src/main
-        mkdir resources
         cd ./resources
         touch ./application.yml
         echo "$APPLICATION_MAIN" > ./application.yml
