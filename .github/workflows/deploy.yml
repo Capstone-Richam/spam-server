@@ -39,17 +39,7 @@ jobs:
       uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
       with:
         arguments: clean build -x test
-    # dd
-    - name: application.yml 설정
-      run: |
-          cd ./src/main
-          mkdir resources
-          cd ./resources
-          touch ./application.properties
-          echo "$APPLICATION_MAIN" > ./application.properties
-      env:
-          APPLICATION_MAIN: ${{ secrets.APPLICATION_MAIN }}
-
+ 
     # (4) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
