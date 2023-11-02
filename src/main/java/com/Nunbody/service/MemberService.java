@@ -1,6 +1,7 @@
 package com.Nunbody.service;
 
 import com.Nunbody.domain.Member;
+
 import com.Nunbody.domain.MemberRepository;
 import com.Nunbody.dto.MemberRegisterResponseDto;
 import com.Nunbody.dto.SignInResponseDto;
@@ -23,6 +24,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     public void register(MemberRegisterResponseDto resource) {
+
         Member member;
         if (resource.isHasNaver() && resource.isHasGmail()) {
             member = Member.builder()
@@ -79,4 +81,5 @@ public class MemberService {
 
 
         }
+
     }
