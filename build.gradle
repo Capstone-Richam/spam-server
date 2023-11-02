@@ -28,7 +28,16 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-	implementation 'mysql:mysql-connector-java:8.0.33'
+
+	//jwt
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+
+	//spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+
 }
 
 tasks.named('test') {
