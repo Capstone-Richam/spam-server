@@ -1,7 +1,7 @@
 package com.Nunbody.jwt;
 
-import com.Nunbody.domain.ErrorCode;
-import com.Nunbody.domain.ErrorResponse;
+import com.Nunbody.global.error.ErrorCode;
+import com.Nunbody.global.error.ErrorResponse;
 import com.Nunbody.jwt.exception.EmptyTokenException;
 import com.Nunbody.jwt.exception.InvalidTokenException;
 import com.fasterxml.jackson.databind.ObjectMapper;

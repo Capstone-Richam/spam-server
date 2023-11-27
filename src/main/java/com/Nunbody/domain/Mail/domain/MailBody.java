@@ -1,4 +1,4 @@
-package com.Nunbody.domain;
+package com.Nunbody.domain.Mail.domain;
 
 import javax.persistence.Id;
 import lombok.Builder;

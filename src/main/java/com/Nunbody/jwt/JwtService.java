@@ -1,6 +1,6 @@
-package com.Nunbody.service;
+package com.Nunbody.jwt;
 
-import com.Nunbody.domain.Member;
+import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.token.Token;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,4 +1,4 @@
-package com.Nunbody.domain;
+package com.Nunbody.global.error;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

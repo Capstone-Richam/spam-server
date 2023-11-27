@@ -1,10 +1,10 @@
-package com.Nunbody.service;
+package com.Nunbody.domain.member.service;
 
-import com.Nunbody.domain.Member;
+import com.Nunbody.domain.member.domain.Member;
 
-import com.Nunbody.domain.MemberRepository;
-import com.Nunbody.dto.MemberRegisterResponseDto;
-import com.Nunbody.dto.SignInResponseDto;
+import com.Nunbody.domain.member.repository.MemberRepository;
+import com.Nunbody.domain.member.dto.MemberRegisterResponseDto;
+import com.Nunbody.domain.member.dto.SignInResponseDto;
 import com.Nunbody.exception.auth.InvalidEmailException;
 import com.Nunbody.exception.auth.InvalidPasswordException;
 import com.Nunbody.jwt.JwtTokenProvider;
@@ -99,11 +99,11 @@ public class MemberService {
                 throw new InvalidPasswordException("잘못된 비밀번호입니다.");
             }
 
-            TokenInfo accessToken = jwtTokenProvider.createAccessToken(member.getMemberId());
-            TokenInfo refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberId());
+            TokenInfo accessToken = jwtTokenProvider.createAccessToken(member.getId());
+            TokenInfo refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
             member.updateRefreshToken(refreshToken.getToken());
             return new SignInResponseDto(
-                    member.getMemberId(), member.getAccount(), member.getName(), member.getNaverId(), member.getNaverPassword(), member.isHasNaver(), member.getGmailId(), member.getGmailPassword(), member.isHasGmail(), accessToken.getToken(), refreshToken.getToken(), accessToken.getExpireTime(), refreshToken.getExpireTime()
+                    member.getId(), member.getAccount(), member.getName(), member.getNaverId(), member.getNaverPassword(), member.getGmailId(), member.getGmailPassword(), accessToken.getToken(), refreshToken.getToken(), accessToken.getExpireTime(), refreshToken.getExpireTime()
             );
         }
 

@@ -1,4 +1,4 @@
-package com.Nunbody.domain;
+package com.Nunbody.global.error;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
