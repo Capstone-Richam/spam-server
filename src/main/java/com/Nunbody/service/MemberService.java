@@ -91,7 +91,7 @@ public class MemberService {
 
         }
 
-@Transactional
+        @Transactional
         public SignInResponseDto signIn (String account, String password){
             Member member = memberRepository.findByAccount(account).orElseThrow(() -> new InvalidEmailException("회원정보가 존재하지 않습니다."));
             if (!passwordEncoder.matches(password, member.getPassword())) {
@@ -105,8 +105,6 @@ public class MemberService {
             return new SignInResponseDto(
                     member.getMemberId(), member.getAccount(), member.getName(), member.getNaverId(), member.getNaverPassword(), member.isHasNaver(), member.getGmailId(), member.getGmailPassword(), member.isHasGmail(), accessToken.getToken(), refreshToken.getToken(), accessToken.getExpireTime(), refreshToken.getExpireTime()
             );
-
-
         }
 
     }
