@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class OAuthService {
 
     private final ObjectMapper objectMapper;
@@ -44,12 +46,12 @@ public class OAuthService {
 
     private static final String GRANT_TYPE = "authorization_code";
 
-    public OAuthService(RestTemplate restTemplate) {
-        this.objectMapper = new ObjectMapper()
-                .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // 이 부분을 추가
-        this.restTemplate = restTemplate;
-    }
+//    public OAuthService(RestTemplate restTemplate) {
+//        this.objectMapper = new ObjectMapper()
+//                .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+//                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // 이 부분을 추가
+//        this.restTemplate = restTemplate;
+//    }
     public ResponseEntity<String> createPostKakaoRequest(String code) {
         String url = "https://kauth.kakao.com/oauth/token";
 
