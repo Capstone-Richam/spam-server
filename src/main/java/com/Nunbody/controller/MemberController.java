@@ -18,7 +18,6 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
     @PostMapping("/user")
-
     public void create(@RequestBody MemberRegisterResponseDto dto){
 
         memberService.register(dto);

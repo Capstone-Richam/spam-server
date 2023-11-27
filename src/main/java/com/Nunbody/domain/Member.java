@@ -19,9 +19,7 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
-
     private String account;
-
     private String password;
     private String name;
     private String naverId;
