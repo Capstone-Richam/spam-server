@@ -1,4 +1,4 @@
-package com.Nunbody.dto;
+package com.Nunbody.domain.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
