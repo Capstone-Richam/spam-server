@@ -1,6 +1,6 @@
-package com.Nunbody.service;
+package com.Nunbody.domain.Mail.service;
 
-import com.Nunbody.domain.MailBody;
+import com.Nunbody.domain.Mail.domain.MailBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;

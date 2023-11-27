@@ -1,18 +1,17 @@
-package com.Nunbody.controller;
+package com.Nunbody.domain.member.controller;
 
 
-import com.Nunbody.dto.MemberRegisterResponseDto;
-import com.Nunbody.dto.SignInRequestDto;
-import com.Nunbody.dto.SignInResponseDto;
+import com.Nunbody.domain.member.dto.MemberRegisterResponseDto;
+import com.Nunbody.domain.member.dto.SignInRequestDto;
+import com.Nunbody.domain.member.dto.SignInResponseDto;
 
-import com.Nunbody.service.MemberService;
+import com.Nunbody.domain.member.service.MemberService;
 
 import com.Nunbody.token.OAuthToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

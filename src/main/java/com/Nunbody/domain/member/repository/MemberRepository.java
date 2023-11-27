@@ -1,6 +1,7 @@
-package com.Nunbody.domain;
+package com.Nunbody.domain.member.repository;
 
 
+import com.Nunbody.domain.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
