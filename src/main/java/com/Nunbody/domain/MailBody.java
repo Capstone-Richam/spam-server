@@ -14,27 +14,4 @@ public class MailBody {
     private String mailId;
     private String content;
 }
-/*static class MailList {
-    private String host;
-    public ArrayList<MailBody> data;
 
-    public MailList() {
-        this.data = new ArrayList<MailBody>();
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public ArrayList<MailBody> getData() {
-        return data;
-    }
-
-    public void addData(MailBody mail) {
-        this.data.add(mail);
-    }
-}*/
