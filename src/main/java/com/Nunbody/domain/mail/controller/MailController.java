@@ -7,6 +7,7 @@ import com.Nunbody.domain.Mail.service.MailService;
 import com.Nunbody.global.common.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class MailController {
 
     @GetMapping("/header")
     public ResponseEntity<SuccessResponse<?>> getHeader(@RequestParam Long userId, @PageableDefault Pageable pageable){
-        final List<MailListResponseDto> mailListResponseDtoList = mailManageService.getMailList(userId, pageable);
+        final Page<MailListResponseDto> mailListResponseDtoList = mailManageService.getMailList(userId, pageable);
         return SuccessResponse.ok(mailListResponseDtoList);
     }
 

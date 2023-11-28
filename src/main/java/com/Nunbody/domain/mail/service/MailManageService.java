@@ -6,6 +6,7 @@ import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,16 +20,13 @@ import java.util.stream.Collectors;
 @Service
 public class MailManageService {
     private final MailRepository mailRepository;
-    public List<MailListResponseDto> getMailList(Long id, Pageable pageable){
+    public Page<MailListResponseDto> getMailList(Long id, Pageable pageable){
 
-        List<MailListResponseDto> mailListResponseDtoList = createMailListResponseDtoList(id);
+        Page<MailListResponseDto> mailListResponseDtoList = createMailListResponseDtoList(id,pageable);
         return mailListResponseDtoList;
     }
-    private List<MailListResponseDto> createMailListResponseDtoList(Long id){
-        List<MailHeader> mailList = mailRepository.findAllByMemberId(id);
-        return mailList.stream()
-                .map(mail ->
-                        MailListResponseDto.of(mail))
-                .collect(Collectors.toList());
+    private Page<MailListResponseDto> createMailListResponseDtoList(Long id, Pageable pageable){
+        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberId(id, pageable);
+        return mailHeaderPage.map(mailHeader -> MailListResponseDto.of(mailHeader));
     }
 }
