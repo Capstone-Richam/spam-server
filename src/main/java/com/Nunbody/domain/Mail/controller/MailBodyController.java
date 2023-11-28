@@ -1,7 +1,7 @@
-package com.Nunbody.domain.mail.controller;
+package com.Nunbody.domain.Mail.controller;
 
-import com.Nunbody.domain.mail.domain.MailBody;
-import com.Nunbody.domain.mail.service.MailService;
+import com.Nunbody.domain.Mail.domain.MailBody;
+import com.Nunbody.domain.Mail.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
