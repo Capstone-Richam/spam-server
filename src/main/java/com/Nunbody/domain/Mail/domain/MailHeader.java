@@ -1,5 +1,10 @@
 package com.Nunbody.domain.Mail.domain;
 
+<<<<<<< HEAD:src/main/java/com/Nunbody/domain/Mail/domain/Mail.java
+import com.Nunbody.domain.member.domain.Member;
+import lombok.*;
+=======
+>>>>>>> aa7adcf7aec8796f91a96c6ffcb3740f6cecd154:src/main/java/com/Nunbody/domain/Mail/domain/MailHeader.java
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,8 +24,12 @@ public class MailHeader {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long userId;
     private String title;
     private String fromPerson;
+    private String date;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
 
 }
