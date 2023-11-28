@@ -4,6 +4,9 @@ package com.Nunbody.domain.Mail.service;
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.MailList;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +24,7 @@ import java.util.Properties;
 @Transactional
 @Service
 public class MailService {
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
     private final Pattern pattern = Pattern.compile("<(.*?)>");
     private Matcher matcher;
     public MailBody Test(){
@@ -70,7 +72,7 @@ public class MailService {
             Message[] messages = folder.getMessages();
             MailHeader mailHeaderData;
 
-
+            getMailBody(messages);
             for(int i=0;i<100;i++){
                 matcher = pattern.matcher(messages[i].getFrom()[0].toString());
                 if(matcher.find()) {
@@ -89,15 +91,41 @@ public class MailService {
                 }
                 naverMail.addData(mailHeaderData);
             }
+
             // 폴더와 스토어 닫기
             folder.close(false);
             store.close();
+
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return naverMail;
+    }
+    public void getMailBody(Message[] messages) throws MessagingException, IOException {
+        List<MailBody> mailBodies = new ArrayList<>();
+        Object content;
+        for (int i=0; i<messages.length/2; i++) {
+            content = messages[i].getContent();
+            MailBody mailBody;
+            if (content instanceof String) {
+                // 텍스트 형식의 콘텐츠인 경우
+                String text = content.toString();
+                mailBody = MailBody.builder()
+                        .content(text)
+                        .build();
+            } else if (content instanceof Multipart) {
+                // 멀티파트인 경우 (예: HTML 메일)
+                Multipart multipart = (Multipart) content;
+                mailBody = MailBody.builder()
+                        .content(multipart.toString())
+                        .build();
+            }
+            else mailBody = null;
+            mailBodies.add(mailBody);
+        }
+        mongoTemplate.insertAll(mailBodies);
     }
 
 }
