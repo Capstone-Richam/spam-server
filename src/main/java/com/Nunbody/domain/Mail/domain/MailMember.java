@@ -21,11 +21,11 @@ public class MailMember {
     private Member member;
     @ManyToOne
     @JoinColumn(name = "mail_id")
-    private Mail mail;
-    public static MailMember createMailMember(Member member, Mail mail) {
+    private MailHeader mailHeader;
+    public static MailMember createMailMember(Member member, MailHeader mailHeader) {
         return MailMember.builder()
                 .member(member)
-                .mail(mail)
+                .mailHeader(mailHeader)
                 .build();
     }
 }

@@ -79,6 +79,6 @@ public class SpringSecurityConfig {
                 "/api/user/**",
                 "/",
                 "/api/mail/**"
-                );
+        );
     }
 }

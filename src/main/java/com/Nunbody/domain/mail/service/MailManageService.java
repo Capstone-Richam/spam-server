@@ -1,6 +1,7 @@
 package com.Nunbody.domain.Mail.service;
 
-import com.Nunbody.domain.Mail.domain.Mail;
+
+import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,7 @@ public class MailManageService {
         return mailListResponseDtoList;
     }
     private List<MailListResponseDto> createMailListResponseDtoList(Long id){
-        List<Mail> mailList = mailRepository.findAllByUserId(id);
+        List<MailHeader> mailList = mailRepository.findAllByUserId(id);
         return mailList.stream()
                 .map(mail ->
                         MailListResponseDto.of(mail))

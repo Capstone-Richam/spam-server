@@ -1,6 +1,6 @@
 package com.Nunbody.domain.Mail.dto.response;
 
-import com.Nunbody.domain.Mail.domain.Mail;
+import com.Nunbody.domain.Mail.domain.MailHeader;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,11 +11,11 @@ public class MailListResponseDto {
     private String fromPerson;
     private String date;
 
-    public static MailListResponseDto of(Mail mail){
+    public static MailListResponseDto of(MailHeader mailHeader){
         return MailListResponseDto.builder()
-                .title(mail.getTitle())
-                .fromPerson(mail.getFromPerson())
-                .date(mail.getDate())
+                .title(mailHeader.getTitle())
+                .fromPerson(mailHeader.getFromPerson())
+                .date(mailHeader.getDate())
                 .build();
     }
 }

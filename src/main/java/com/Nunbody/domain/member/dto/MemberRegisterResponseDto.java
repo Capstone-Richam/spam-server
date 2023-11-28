@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberRegisterResponseDto {
+    private Long id;
     private String account;
     private String password;
     private String name;

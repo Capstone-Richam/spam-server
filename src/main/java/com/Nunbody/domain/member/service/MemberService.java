@@ -54,18 +54,17 @@ public class MemberService {
 
         Member member;
 
-            member = Member.builder()
-                    .account(resource.getAccount())
-                    .password(passwordEncoder.encode(resource.getPassword()))
-                    .name(resource.getName())
-                    .naverId(resource.getNaverId())
-                    .naverPassword(resource.getNaverPassword())
-                    .gmailId(resource.getGmailId())
-                    .gmailPassword(resource.getGmailPassword())
-                    .refreshToken(null).build();
+        member = Member.builder()
+                .account(resource.getAccount())
+                .password(passwordEncoder.encode(resource.getPassword()))
+                .name(resource.getName())
+                .naverId(resource.getNaverId())
+                .naverPassword(resource.getNaverPassword())
+                .gmailId(resource.getGmailId())
+                .gmailPassword(resource.getGmailPassword())
+                .refreshToken(null).build();
 
             memberRepository.save(member);
-
         }
 
         @Transactional
