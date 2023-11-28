@@ -1,9 +1,15 @@
 package com.Nunbody.domain.Mail.service;
 
+import com.Nunbody.domain.Mail.controller.MailController;
+import com.Nunbody.domain.Mail.domain.Mail;
 import com.Nunbody.domain.Mail.domain.MailBody;
+import com.Nunbody.domain.Mail.domain.MailList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+
+import javax.mail.*;
+import java.util.Properties;
 
 @Service
 public class MailService {
@@ -20,5 +26,64 @@ public class MailService {
                 .build();
 
         return mongoTemplate.insert(mailBody);
+    }
+    public MailList getMail(String host){
+        MailList naverMail = new MailList();
+        naverMail.setHost(host);
+
+        /** naver mail */
+        final String naverHost = "imap.naver.com";
+        final String naverId = "아이디";
+        final String naverPassword = "비밀번호";
+
+        try {
+            Properties prop = new Properties();
+            prop.put("mail.imap.host", naverHost);
+            prop.put("mail.imap.port", 993);
+            prop.put("mail.imap.ssl.enable", "true");
+            prop.put("mail.imap.ssl.protocols", "TLSv1.2");
+            prop.put("mail.store.protocol", "imap");
+
+
+            // Session 클래스 인스턴스 생성
+            Session session = Session.getInstance(prop);
+
+            // Store 클래스
+            Store store = session.getStore("imap");
+            store.connect(naverHost, naverId, naverPassword);
+
+            // 받은 편지함
+            Folder folder = store.getFolder("INBOX");
+            folder.open(Folder.READ_ONLY);
+
+            Message[] messages = folder.getMessages();
+            Mail mailData;
+
+//            for(Message message: messages) {
+//                mailData = new Mail();
+//                mailData.setTitle(message.getSubject());
+//                mailData.setFrom(message.getFrom()[0].toString());
+//                mailData.setContent(message.getContent().toString());
+//                naverMail.addData(mailData);
+//            }
+
+            for(int i=0;i<100;i++){
+                mailData = new Mail();
+                mailData.setTitle(messages[i].getSubject());
+                mailData.setFrom(messages[i].getFrom()[0].toString());
+                mailData.setContent(messages[i].getContent().toString());
+                naverMail.addData(mailData);
+            }
+
+
+            // 폴더와 스토어 닫기
+            folder.close(false);
+            store.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return naverMail;
     }
 }
