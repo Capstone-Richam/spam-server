@@ -78,6 +78,7 @@ public class MailService {
                     mailHeaderData = MailHeader.builder()
                             .title(messages[i].getSubject())
                             .fromPerson(fromPerson)
+                            .date(String.valueOf(messages[i].getSentDate()))
                             .build();
                 }
                 else {
@@ -88,8 +89,6 @@ public class MailService {
                 }
                 naverMail.addData(mailHeaderData);
             }
-
-
             // 폴더와 스토어 닫기
             folder.close(false);
             store.close();
