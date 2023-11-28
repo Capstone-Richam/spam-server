@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MailRepository extends JpaRepository<MailHeader,Long> {
-    List<MailHeader> findAllByUserId(Long id);
+    List<MailHeader> findAllByMemberId(Long id);
 }
