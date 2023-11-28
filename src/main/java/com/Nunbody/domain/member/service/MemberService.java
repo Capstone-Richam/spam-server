@@ -53,7 +53,7 @@ public class MemberService {
     public void register(MemberRegisterResponseDto resource) {
 
         Member member;
-        if (resource.isHasNaver() && resource.isHasGmail()) {
+
             member = Member.builder()
                     .account(resource.getAccount())
                     .password(passwordEncoder.encode(resource.getPassword()))
@@ -63,30 +63,7 @@ public class MemberService {
                     .gmailId(resource.getGmailId())
                     .gmailPassword(resource.getGmailPassword())
                     .refreshToken(null).build();
-        }
-        else if (resource.isHasNaver()) {
-                member = Member.builder()
-                        .account(resource.getAccount())
-                        .password(passwordEncoder.encode(resource.getPassword()))
-                        .name(resource.getName())
-                        .naverId(resource.getNaverId())
-                        .naverPassword(resource.getNaverPassword())
-                        .refreshToken(null).build();
-            } else if (resource.isHasGmail()) {
-                member = Member.builder()
-                        .account(resource.getAccount())
-                        .password(passwordEncoder.encode(resource.getPassword()))
-                        .name(resource.getName())
-                        .gmailId(resource.getGmailId())
-                        .gmailPassword(resource.getGmailPassword())
-                        .refreshToken(null).build();
-            } else {
-                member = Member.builder()
-                        .account(resource.getAccount())
-                        .password(passwordEncoder.encode(resource.getPassword()))
-                        .name(resource.getName())
-                        .refreshToken(null).build();
-            }
+
             memberRepository.save(member);
 
         }

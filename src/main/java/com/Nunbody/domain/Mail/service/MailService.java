@@ -78,7 +78,7 @@ public class MailService {
             for(int i=0;i<100;i++){
                 mailData = Mail.builder()
                         .title(messages[i].getSubject())
-                        .from(messages[i].getFrom()[0].toString())
+                        .fromPerson(messages[i].getFrom()[0].toString())
                         .content(messages[i].getContent().toString())
                         .build();
 //                mailData.setTitle(messages[i].getSubject());

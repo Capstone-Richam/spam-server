@@ -42,4 +42,5 @@ public class MemberController {
     public OAuthToken getOauthTokenWithCode(@PathVariable String socialLoginType, @RequestParam String code) throws JsonProcessingException {
         return memberService.getOauthTokenWithCode(socialLoginType,code);
     }
+
 }
