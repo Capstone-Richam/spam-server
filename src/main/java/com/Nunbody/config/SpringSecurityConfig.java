@@ -29,7 +29,7 @@ public class SpringSecurityConfig {
     private final JwtTokenProvider tokenProvider;
     private final ExceptionHandleFilter exceptionFilter;
     private final CorsConfig corsConfig;
-    private static final String[] whiteList = {"/api/user/**"};
+    private static final String[] whiteList = {"/api/user/**","/api/mail/**"};
 
 
     @Bean

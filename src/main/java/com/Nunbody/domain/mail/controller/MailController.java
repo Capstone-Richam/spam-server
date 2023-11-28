@@ -2,6 +2,7 @@ package com.Nunbody.domain.Mail.controller;
 
 import com.Nunbody.domain.Mail.domain.MailList;
 import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
+import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
 import com.Nunbody.domain.Mail.service.MailManageService;
 import com.Nunbody.domain.Mail.service.MailService;
 import com.Nunbody.global.common.SuccessResponse;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -35,6 +37,10 @@ public class MailController {
         final Page<MailListResponseDto> mailListResponseDtoList = mailManageService.getMailList(userId, pageable);
         return SuccessResponse.ok(mailListResponseDtoList);
     }
-
+    @PostMapping("/validate")
+    public ResponseEntity<SuccessResponse<?>> validate(@RequestBody ValidateRequestDto validateRequestDto) throws MessagingException {
+        final String string= mailManageService.validateConnect(validateRequestDto);
+        return SuccessResponse.ok(string);
+    }
 }
 
