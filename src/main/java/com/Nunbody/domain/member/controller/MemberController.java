@@ -7,28 +7,31 @@ import com.Nunbody.domain.member.dto.SignInResponseDto;
 
 import com.Nunbody.domain.member.service.MemberService;
 
+import com.Nunbody.global.common.SuccessResponse;
 import com.Nunbody.token.OAuthToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
+@RequiredArgsConstructor
 public class MemberController {
-    @Autowired
-    private MemberService memberService;
+
+    private final MemberService memberService;
 
 
-    @PostMapping("/signUp")
-    public void create(@RequestBody MemberRegisterResponseDto dto){
-
+    @PostMapping("/signup")
+    public ResponseEntity<SuccessResponse<?>> create(@RequestBody MemberRegisterResponseDto dto){
         memberService.register(dto);
-
+        return SuccessResponse.ok(null);
     }
 
-    @PostMapping("/signIn")
+    @PostMapping("/signin")
     @ResponseStatus(HttpStatus.OK)
     public SignInResponseDto signIn(@RequestBody SignInRequestDto dto) {
         return memberService.signIn(dto.getAccount(), dto.getPassword());

@@ -4,13 +4,19 @@ import com.Nunbody.domain.Mail.controller.MailController;
 import com.Nunbody.domain.Mail.domain.Mail;
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailList;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.*;
 import java.util.Properties;
 
+@Slf4j
+@RequiredArgsConstructor
+@Transactional
 @Service
 public class MailService {
     @Autowired
@@ -28,13 +34,15 @@ public class MailService {
         return mongoTemplate.insert(mailBody);
     }
     public MailList getMail(String host){
-        MailList naverMail = new MailList();
-        naverMail.setHost(host);
+        MailList naverMail = MailList.builder()
+                .host(host)
+                .build();
+//        naverMail.setHost(host);
 
         /** naver mail */
         final String naverHost = "imap.naver.com";
-        final String naverId = "아이디";
-        final String naverPassword = "비밀번호";
+        final String naverId = "haulqogustj";
+        final String naverPassword = "qogustj50@";
 
         try {
             Properties prop = new Properties();
@@ -68,10 +76,14 @@ public class MailService {
 //            }
 
             for(int i=0;i<100;i++){
-                mailData = new Mail();
-                mailData.setTitle(messages[i].getSubject());
-                mailData.setFrom(messages[i].getFrom()[0].toString());
-                mailData.setContent(messages[i].getContent().toString());
+                mailData = Mail.builder()
+                        .title(messages[i].getSubject())
+                        .from(messages[i].getFrom()[0].toString())
+                        .content(messages[i].getContent().toString())
+                        .build();
+//                mailData.setTitle(messages[i].getSubject());
+//                mailData.setFrom(messages[i].getFrom()[0].toString());
+//                mailData.setContent(messages[i].getContent().toString());
                 naverMail.addData(mailData);
             }
 
