@@ -1,7 +1,12 @@
 package com.Nunbody.domain.Mail.domain;
 
-import lombok.*;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import lombok.Builder;
+import lombok.*;
 import javax.persistence.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -10,13 +15,12 @@ import javax.persistence.*;
 @Getter
 @Table(name = "mail")
 @Entity
-public class Mail {
+public class MailHeader {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long userId;
     private String title;
-    private String from;
-    private String content;
-
+    private String fromPerson;
 
 }

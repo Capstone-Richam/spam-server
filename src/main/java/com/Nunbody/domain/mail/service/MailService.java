@@ -1,9 +1,11 @@
 package com.Nunbody.domain.Mail.service;
 
-import com.Nunbody.domain.Mail.controller.MailController;
-import com.Nunbody.domain.Mail.domain.Mail;
+
 import com.Nunbody.domain.Mail.domain.MailBody;
+import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.MailList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +23,12 @@ import java.util.Properties;
 public class MailService {
     @Autowired
     private MongoTemplate mongoTemplate;
-
+    private final Pattern pattern = Pattern.compile("<(.*?)>");
+    private Matcher matcher;
     public MailBody Test(){
         MailBody mailBody;
         mailBody = MailBody.builder()
-//                .hostId("jinseok")
-//                .title("안녕하세요. 가짜 메일입니다.")
-//                .from("hoyoen@naver.com")
+                .mailId("1")
                 .content("안녕하세요 최호연이라고 합니다. 이렇게 연락드리게 되어서 대단히 죄송합니다")
                 .build();
 
@@ -37,12 +38,14 @@ public class MailService {
         MailList naverMail = MailList.builder()
                 .host(host)
                 .build();
-//        naverMail.setHost(host);
 
         /** naver mail */
         final String naverHost = "imap.naver.com";
-        final String naverId = "haulqogustj";
-        final String naverPassword = "qogustj50@";
+        final String naverId = "qkrwlstjr0131";
+        final String naverPassword = "beakgugong1!";
+//        naverMail.setHost(host);
+
+
 
         try {
             Properties prop = new Properties();
@@ -65,26 +68,25 @@ public class MailService {
             folder.open(Folder.READ_ONLY);
 
             Message[] messages = folder.getMessages();
-            Mail mailData;
+            MailHeader mailHeaderData;
 
-//            for(Message message: messages) {
-//                mailData = new Mail();
-//                mailData.setTitle(message.getSubject());
-//                mailData.setFrom(message.getFrom()[0].toString());
-//                mailData.setContent(message.getContent().toString());
-//                naverMail.addData(mailData);
-//            }
 
             for(int i=0;i<100;i++){
-                mailData = Mail.builder()
-                        .title(messages[i].getSubject())
-                        .from(messages[i].getFrom()[0].toString())
-                        .content(messages[i].getContent().toString())
-                        .build();
-//                mailData.setTitle(messages[i].getSubject());
-//                mailData.setFrom(messages[i].getFrom()[0].toString());
-//                mailData.setContent(messages[i].getContent().toString());
-                naverMail.addData(mailData);
+                matcher = pattern.matcher(messages[i].getFrom()[0].toString());
+                if(matcher.find()) {
+                    String fromPerson = matcher.group(1);
+                    mailHeaderData = MailHeader.builder()
+                            .title(messages[i].getSubject())
+                            .fromPerson(fromPerson)
+                            .build();
+                }
+                else {
+                    mailHeaderData = MailHeader.builder()
+                            .title(messages[i].getSubject())
+                            .fromPerson(messages[i].getFrom()[0].toString())
+                            .build();
+                }
+                naverMail.addData(mailHeaderData);
             }
 
 
@@ -98,4 +100,5 @@ public class MailService {
 
         return naverMail;
     }
+
 }
