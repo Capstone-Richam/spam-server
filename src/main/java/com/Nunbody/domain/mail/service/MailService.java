@@ -1,17 +1,20 @@
 package com.Nunbody.domain.Mail.service;
 
-
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.MailList;
+import com.sun.mail.util.BASE64DecoderStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.mail.internet.MimeMultipart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,27 +30,17 @@ public class MailService {
     private final MongoTemplate mongoTemplate;
     private final Pattern pattern = Pattern.compile("<(.*?)>");
     private Matcher matcher;
-    public MailBody Test(){
-        MailBody mailBody;
-        mailBody = MailBody.builder()
-                .mailId("1")
-                .content("안녕하세요 최호연이라고 합니다. 이렇게 연락드리게 되어서 대단히 죄송합니다")
-                .build();
 
-        return mongoTemplate.insert(mailBody);
-    }
-    public MailList getMail(String host){
+    public MailList getMail(String host) {
         MailList naverMail = MailList.builder()
                 .host(host)
                 .build();
 
         /** naver mail */
         final String naverHost = "imap.naver.com";
-        final String naverId = "qkrwlstjr0131";
-        final String naverPassword = "beakgugong1!";
+        final String naverId = "haulqogustj@naver.com";
+        final String naverPassword = "qogustj50@";
 //        naverMail.setHost(host);
-
-
 
         try {
             Properties prop = new Properties();
@@ -56,7 +49,6 @@ public class MailService {
             prop.put("mail.imap.ssl.enable", "true");
             prop.put("mail.imap.ssl.protocols", "TLSv1.2");
             prop.put("mail.store.protocol", "imap");
-
 
             // Session 클래스 인스턴스 생성
             Session session = Session.getInstance(prop);
@@ -72,18 +64,16 @@ public class MailService {
             Message[] messages = folder.getMessages();
             MailHeader mailHeaderData;
 
-            getMailBody(messages);
-            for(int i=0;i<100;i++){
+            for (int i = 0; i < 100; i++) {
                 matcher = pattern.matcher(messages[i].getFrom()[0].toString());
-                if(matcher.find()) {
+                if (matcher.find()) {
                     String fromPerson = matcher.group(1);
                     mailHeaderData = MailHeader.builder()
                             .title(messages[i].getSubject())
                             .fromPerson(fromPerson)
-                            .date(String.valueOf(messages[i].getSentDate()))
+                            .date(String.valueOf(messages[i].getReceivedDate()))
                             .build();
-                }
-                else {
+                } else {
                     mailHeaderData = MailHeader.builder()
                             .title(messages[i].getSubject())
                             .fromPerson(messages[i].getFrom()[0].toString())
@@ -91,7 +81,7 @@ public class MailService {
                 }
                 naverMail.addData(mailHeaderData);
             }
-
+            getMailBody(messages);
             // 폴더와 스토어 닫기
             folder.close(false);
             store.close();
@@ -103,29 +93,100 @@ public class MailService {
 
         return naverMail;
     }
+
     public void getMailBody(Message[] messages) throws MessagingException, IOException {
         List<MailBody> mailBodies = new ArrayList<>();
-        Object content;
-        for (int i=0; i<messages.length/2; i++) {
-            content = messages[i].getContent();
-            MailBody mailBody;
-            if (content instanceof String) {
-                // 텍스트 형식의 콘텐츠인 경우
-                String text = content.toString();
-                mailBody = MailBody.builder()
-                        .content(text)
-                        .build();
-            } else if (content instanceof Multipart) {
-                // 멀티파트인 경우 (예: HTML 메일)
-                Multipart multipart = (Multipart) content;
-                mailBody = MailBody.builder()
-                        .content(multipart.toString())
-                        .build();
+
+        for (int i = 0; i < 50; i++) {
+            Object content = messages[i].getContent();
+            byte[] contentBytes = null;
+
+            if (content instanceof Multipart) {
+                List<byte[]> multipartContentBytes = parseMultipart(messages[i], (Multipart) content);
+                // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
+                contentBytes = combineMultipartContent(multipartContentBytes);
+            } else if(content instanceof Part){
+
+                contentBytes = parseBody(messages[i], (BodyPart) content);
             }
-            else mailBody = null;
+
+            MailBody mailBody = MailBody.builder()
+                    .content(contentBytes != null ? new String(contentBytes, StandardCharsets.UTF_8) : null)
+                    .build();
+
             mailBodies.add(mailBody);
         }
+
         mongoTemplate.insertAll(mailBodies);
     }
 
+    private static List<byte[]> parseMultipart(Message message, Multipart mp) throws IOException, MessagingException {
+        MimeMultipart mm = (MimeMultipart) mp;
+
+        List<byte[]> multipartContentBytes = new ArrayList<>();
+
+        int bodyCount = mm.getCount();
+        for (int i = 0; i < bodyCount; i++) {
+            BodyPart bodyPart = mm.getBodyPart(i);
+            Object partContent = bodyPart.getContent();
+
+            byte[] partContentBytes = parseBody(message,bodyPart);
+            multipartContentBytes.add(partContentBytes);
+        }
+
+        return multipartContentBytes;
+    }
+
+    private static byte[] combineMultipartContent(List<byte[]> multipartContentBytes) {
+        // 여러 BodyPart의 결과를 합치는 로직을 구현
+        // 예를 들어, 각 부분을 줄바꿈으로 구분하여 이어붙일 수 있습니다.
+        StringBuilder combinedContent = new StringBuilder();
+        for (byte[] partContentBytes : multipartContentBytes) {
+            if (partContentBytes != null) {
+                combinedContent.append(new String(partContentBytes, StandardCharsets.UTF_8));
+                combinedContent.append(System.lineSeparator()); // 각 부분을 줄바꿈으로 구분
+            }
+        }
+
+        // 최종 결과를 byte 배열로 변환
+        return combinedContent.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    private static byte[] parseBody(Message message, BodyPart bp) throws IOException, MessagingException {
+        Object obj = bp.getContent();
+        byte[] contentBytes = null;
+
+        if (obj instanceof BASE64DecoderStream) {
+            // 처리할 첨부 파일
+            BASE64DecoderStream newObj = (BASE64DecoderStream) obj;
+
+            contentBytes = readInputStream(newObj);
+
+            newObj.close();
+        } else if (obj instanceof String) {
+            // 텍스트 형식인 경우
+            String contentType = message.getContentType().toLowerCase();
+
+            contentBytes = ((String) obj).getBytes(StandardCharsets.UTF_8);
+
+        } else if (obj instanceof Multipart) {
+            parseMultipart(message, (Multipart) obj);
+        } else {
+            // 기타 형식인 경우
+            contentBytes = bp.getContentType().getBytes(StandardCharsets.UTF_8);
+        }
+
+        return contentBytes;
+    }
+
+    private static byte[] readInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[1024];
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+        return buffer.toByteArray();
+    }
 }

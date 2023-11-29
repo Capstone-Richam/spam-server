@@ -28,26 +28,19 @@ public class SpringSecurityConfig {
 
     private final JwtTokenProvider tokenProvider;
     private final ExceptionHandleFilter exceptionFilter;
+    private final CorsConfig corsConfig;
+    private static final String[] whiteList = {"/api/user/**","/api/mail/**"};
 
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring().antMatchers(whiteList);
+    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic().disable()
                 .csrf().disable()
-                .cors(c -> {
-                            CorsConfigurationSource source = request -> {
-                                // Cors 허용 패턴1
-                                CorsConfiguration config = new CorsConfiguration();
-                                config.setAllowedOrigins(List.of("http://localhost:5173", "https://diamond-hackathon-kutisms.vercel.app"));
-                                config.setAllowedHeaders(List.of("*"));
-                                config.setAllowedMethods(List.of("*"));
-                                config.setAllowCredentials(true);
-
-                                return config;
-                            };
-                            c.configurationSource(source);
-                        }
-                )
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
@@ -55,6 +48,7 @@ public class SpringSecurityConfig {
 //                    .anyRequest().authenticated()
                 .anyRequest().permitAll()
                 .and()
+                .addFilter(corsConfig.corsFilter())
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(exceptionFilter, JwtAuthenticationFilter.class);
 
@@ -66,19 +60,5 @@ public class SpringSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().antMatchers(
-                "/v2/api-docs/**",
-                "/favicon.ico",
-                "/swagger-resources/**",
-                "/swagger-ui/**",
-                "/swagger/**",
-                "/error",
-                "/auth/**",
-                "/api/user/**",
-                "/",
-                "/api/mail/**"
-        );
-    }
+
 }

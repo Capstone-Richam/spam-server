@@ -12,8 +12,5 @@ import org.springframework.web.bind.annotation.RestController;
 public class MailBodyController {
     @Autowired
     private MailService mailService;
-    @GetMapping("/mail_body")
-    public MailBody test(){
-        return mailService.Test();
-    }
+
 }

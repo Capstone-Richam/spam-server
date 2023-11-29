@@ -41,8 +41,8 @@ public class ExceptionHandleFilter extends OncePerRequestFilter {
             );
         } catch (Exception exception) {
             setErrorResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    ErrorCode.INTERNAL_SERVER_ERROR,
+                    HttpStatus.CONFLICT,
+                    ErrorCode.IMAP_ERROR,
                     request, response, exception.getMessage(), "DEFAULT-ERROR-01"
             );
         }
