@@ -3,6 +3,8 @@ package com.Nunbody.domain.Mail.service;
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.MailList;
+import com.Nunbody.domain.Mail.repository.MailBodyRepository;
+import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.sun.mail.util.BASE64DecoderStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,10 +30,13 @@ import java.util.Properties;
 @Service
 public class MailService {
     private final MongoTemplate mongoTemplate;
+    private final MailBodyRepository mailBodyRepository;
+    private final MailRepository mailRepository;
     private final Pattern pattern = Pattern.compile("<(.*?)>");
     private Matcher matcher;
 
     public MailList getMail(String host) {
+        List<MailBody> mailBodies = new ArrayList<>();
         MailList naverMail = MailList.builder()
                 .host(host)
                 .build();
@@ -64,7 +69,7 @@ public class MailService {
             Message[] messages = folder.getMessages();
             MailHeader mailHeaderData;
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 20; i++) {
                 matcher = pattern.matcher(messages[i].getFrom()[0].toString());
                 if (matcher.find()) {
                     String fromPerson = matcher.group(1);
@@ -79,9 +84,13 @@ public class MailService {
                             .fromPerson(messages[i].getFrom()[0].toString())
                             .build();
                 }
+                mailRepository.save(mailHeaderData);
                 naverMail.addData(mailHeaderData);
+
+                Long mailId = mailHeaderData.getId();
+                mailBodies.add(extractMailBody(messages[i],mailId));
             }
-            getMailBody(messages);
+            mongoTemplate.insertAll(mailBodies);
             // 폴더와 스토어 닫기
             folder.close(false);
             store.close();
@@ -94,30 +103,25 @@ public class MailService {
         return naverMail;
     }
 
-    public void getMailBody(Message[] messages) throws MessagingException, IOException {
-        List<MailBody> mailBodies = new ArrayList<>();
+    public MailBody extractMailBody(Message messages, Long mailId) throws MessagingException, IOException {
 
-        for (int i = 0; i < 50; i++) {
-            Object content = messages[i].getContent();
-            byte[] contentBytes = null;
+        Object content = messages.getContent();
+        byte[] contentBytes = null;
 
-            if (content instanceof Multipart) {
-                List<byte[]> multipartContentBytes = parseMultipart(messages[i], (Multipart) content);
-                // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
-                contentBytes = combineMultipartContent(multipartContentBytes);
-            } else if(content instanceof Part){
-
-                contentBytes = parseBody(messages[i], (BodyPart) content);
-            }
-
-            MailBody mailBody = MailBody.builder()
-                    .content(contentBytes != null ? new String(contentBytes, StandardCharsets.UTF_8) : null)
-                    .build();
-
-            mailBodies.add(mailBody);
+        if (content instanceof Multipart) {
+            List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
+            // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
+            contentBytes = combineMultipartContent(multipartContentBytes);
+        } else if(content instanceof Part){
+            contentBytes = parseBody(messages, (BodyPart) content);
         }
 
-        mongoTemplate.insertAll(mailBodies);
+        MailBody mailBody = MailBody.builder()
+                .mailId(mailId)
+                .content(contentBytes != null ? new String(contentBytes, StandardCharsets.UTF_8) : null)
+                .build();
+
+        return mailBody;
     }
 
     private static List<byte[]> parseMultipart(Message message, Multipart mp) throws IOException, MessagingException {
@@ -188,5 +192,9 @@ public class MailService {
         }
         buffer.flush();
         return buffer.toByteArray();
+    }
+
+    public MailBody getMailBody(Long mailId) {
+        return mailBodyRepository.findByMailId(mailId);
     }
 }

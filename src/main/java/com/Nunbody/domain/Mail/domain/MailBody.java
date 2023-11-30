@@ -17,7 +17,7 @@ public class MailBody {
     @Id
     private String id;
     @Field(name = "mail_id")
-    private String mailId;
+    private Long mailId;
     @Field(name = "content")
     private String content;
 }
