@@ -3,15 +3,22 @@ package com.Nunbody.domain.Mail.domain;
 import javax.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
+import org.hibernate.annotations.Fetch;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "mail_body")
+
 @Data
 @Builder
+@ToString
+@Document(collection = "mail_body")
 public class MailBody {
     @Id
     private String id;
-    private String mailId;
+    @Field(name = "mail_id")
+    private Long mailId;
+    @Field(name = "content")
     private String content;
 }
 

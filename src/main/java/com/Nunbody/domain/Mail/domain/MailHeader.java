@@ -1,6 +1,5 @@
 package com.Nunbody.domain.Mail.domain;
 
-
 import com.Nunbody.domain.member.domain.Member;
 import lombok.*;
 
@@ -28,6 +27,5 @@ public class MailHeader {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
-
 
 }
