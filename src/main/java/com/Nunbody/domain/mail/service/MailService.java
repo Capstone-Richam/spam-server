@@ -45,7 +45,7 @@ public class MailService {
 
 
     public MailList getMail(Long userId){
-
+        List<MailBody> mailBodies = new ArrayList<>();
         MailList naverMail = MailList.builder()
                 .userId(userId)
                 .build();
@@ -78,7 +78,7 @@ public class MailService {
             folder.open(Folder.READ_ONLY);
 
             Message[] messages = folder.getMessages();
-//            MailHeader mailData;
+            MailHeader mailHeaderData;
 
 
             for (int i = 0; i < 20; i++) {
@@ -103,7 +103,6 @@ public class MailService {
                 mailBodies.add(extractMailBody(messages[i],mailId));
             }
             mongoTemplate.insertAll(mailBodies);
-
             // 폴더와 스토어 닫기
             folder.close(false);
             store.close();
