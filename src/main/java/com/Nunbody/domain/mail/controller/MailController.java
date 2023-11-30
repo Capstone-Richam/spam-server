@@ -27,8 +27,8 @@ public class MailController {
     private final MailManageService mailManageService;
     @GetMapping("/mails")
     @ResponseBody
-    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam("host") String host) {
-        final MailList mailList = mailService.getMail(host);
+    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long userId) {
+        final MailList mailList = mailService.getMail(userId);
         return SuccessResponse.ok(mailList);
     }
 

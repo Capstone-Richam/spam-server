@@ -6,6 +6,10 @@ import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.MailList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.Nunbody.domain.Mail.repository.MailBodyRepository;
+import com.Nunbody.domain.Mail.repository.MailRepository;
+import com.Nunbody.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +25,11 @@ import java.util.Properties;
 @Transactional
 @Service
 public class MailService {
-    @Autowired
-    private MongoTemplate mongoTemplate;
+
+    private final MongoTemplate mongoTemplate;
+    private final MailBodyRepository mailBodyRepository;
+    private final MailRepository mailRepository;
+    private final MemberRepository memberRepository;
     private final Pattern pattern = Pattern.compile("<(.*?)>");
     private Matcher matcher;
     public MailBody Test(){
@@ -34,15 +41,15 @@ public class MailService {
 
         return mongoTemplate.insert(mailBody);
     }
-    public MailList getMail(String host){
+    public MailList getMail(Long userId){
         MailList naverMail = MailList.builder()
-                .host(host)
+                .userId(userId)
                 .build();
 
         /** naver mail */
         final String naverHost = "imap.naver.com";
-        final String naverId = "qkrwlstjr0131";
-        final String naverPassword = "beakgugong1!";
+        final String naverId = "haulqogustj";
+        final String naverPassword = "qogustj50@";
 //        naverMail.setHost(host);
 
 
@@ -68,26 +75,43 @@ public class MailService {
             folder.open(Folder.READ_ONLY);
 
             Message[] messages = folder.getMessages();
-            MailHeader mailHeaderData;
+//            MailHeader mailData;
 
-
-            for(int i=0;i<100;i++){
-                matcher = pattern.matcher(messages[i].getFrom()[0].toString());
-                if(matcher.find()) {
-                    String fromPerson = matcher.group(1);
-                    mailHeaderData = MailHeader.builder()
-                            .title(messages[i].getSubject())
-                            .fromPerson(fromPerson)
-                            .build();
-                }
-                else {
-                    mailHeaderData = MailHeader.builder()
+            for(int i=0;i<10;i++){
+//                mailHeaderData = new MailHeader();
+               MailHeader mailHeaderData = MailHeader.builder()
+                       .member(memberRepository.findById(userId).orElseThrow())
                             .title(messages[i].getSubject())
                             .fromPerson(messages[i].getFrom()[0].toString())
                             .build();
-                }
-                naverMail.addData(mailHeaderData);
+                mailRepository.save(mailHeaderData);
+//                naverMail.addData(mailHeaderData);
+                MailBody mailBody = MailBody.builder()
+                        .content(messages[i].getContent().toString())
+                        .mailId(mailHeaderData.getId().toString())
+                        .build();
+                mailBodyRepository.save(mailBody);
+
             }
+
+
+//            for(int i=0;i<100;i++){
+//                matcher = pattern.matcher(messages[i].getFrom()[0].toString());
+//                if(matcher.find()) {
+//                    String fromPerson = matcher.group(1);
+//                    mailHeaderData = MailHeader.builder()
+//                            .title(messages[i].getSubject())
+//                            .fromPerson(fromPerson)
+//                            .build();
+//                }
+//                else {
+//                    mailHeaderData = MailHeader.builder()
+//                            .title(messages[i].getSubject())
+//                            .fromPerson(messages[i].getFrom()[0].toString())
+//                            .build();
+//                }
+//                naverMail.addData(mailHeaderData);
+//            }
 
 
             // 폴더와 스토어 닫기

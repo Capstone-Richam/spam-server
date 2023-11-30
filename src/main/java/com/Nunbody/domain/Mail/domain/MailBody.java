@@ -13,5 +13,7 @@ public class MailBody {
     private String id;
     private String mailId;
     private String content;
+
+
 }
 
