@@ -31,7 +31,6 @@ public class MailController {
         final MailList mailList = mailService.getMail(userId);
         return SuccessResponse.ok(mailList);
     }
-
     @GetMapping("/header")
     public ResponseEntity<SuccessResponse<?>> getHeader(@RequestParam Long userId, @PageableDefault Pageable pageable){
         final Page<MailListResponseDto> mailListResponseDtoList = mailManageService.getMailList(userId, pageable);
