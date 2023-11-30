@@ -7,6 +7,7 @@ import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 
 import com.Nunbody.global.error.exception.InvalidValueException;
+import com.Nunbody.global.error.exception.LoginException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,15 +16,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Store;
+import javax.mail.*;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static com.Nunbody.global.error.ErrorCode.IMAP_ERROR;
+import static com.Nunbody.global.error.ErrorCode.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -57,12 +55,20 @@ public class MailManageService {
             Store store = createStore(prop);
             store.connect("imap.naver.com", id, password);
             return "성공";
-        } catch (MessagingException e) {
-            String errorMessage = "IMAP 연결 실패: " + e.getMessage();
-            // 여기에서 errorMessage를 로깅하거나 필요한 처리를 수행할 수 있습니다.
-            throw new InvalidValueException(IMAP_ERROR);
-
+        } catch (AuthenticationFailedException e) {
+            String errorMessage = e.getMessage();
+            if (errorMessage.contains("Please check your username, password")) {
+                // Handle username or password error
+                // You can log the error message or perform any other necessary actions
+                throw new InvalidValueException(INVALID_EMAIL_ERROR);
+            } if (errorMessage.contains("Please check IMAP/SMTP settings in the webmail")) {
+                // Handle IMAP/SMTP settings error
+                // You can log the error message or perform any other necessary actions
+                throw new InvalidValueException(IMAP_ERROR);
+            }
         }
+
+        return null;
     }
     private Store createStore(Properties prop) throws NoSuchProviderException {
         Session session = Session.getInstance(prop);

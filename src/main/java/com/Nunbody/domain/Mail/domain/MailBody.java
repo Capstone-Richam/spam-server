@@ -20,5 +20,7 @@ public class MailBody {
     private Long mailId;
     @Field(name = "content")
     private String content;
+
+
 }
 

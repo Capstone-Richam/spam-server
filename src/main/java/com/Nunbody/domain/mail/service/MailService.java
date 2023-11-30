@@ -5,6 +5,7 @@ import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.MailList;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
+import com.Nunbody.domain.member.repository.MemberRepository;
 import com.sun.mail.util.BASE64DecoderStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.mail.internet.MimeMultipart;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -29,21 +32,29 @@ import java.util.Properties;
 @Transactional
 @Service
 public class MailService {
+
+
     private final MongoTemplate mongoTemplate;
     private final MailBodyRepository mailBodyRepository;
     private final MailRepository mailRepository;
+    private final MemberRepository memberRepository;
+
     private final Pattern pattern = Pattern.compile("<(.*?)>");
     private Matcher matcher;
 
-    public MailList getMail(String host) {
+
+
+    public MailList getMail(Long userId){
         List<MailBody> mailBodies = new ArrayList<>();
         MailList naverMail = MailList.builder()
-                .host(host)
+                .userId(userId)
                 .build();
 
         /** naver mail */
         final String naverHost = "imap.naver.com";
+
         final String naverId = "haulqogustj@naver.com";
+
         final String naverPassword = "qogustj50@";
 //        naverMail.setHost(host);
 
@@ -68,6 +79,7 @@ public class MailService {
 
             Message[] messages = folder.getMessages();
             MailHeader mailHeaderData;
+
 
             for (int i = 0; i < 20; i++) {
                 matcher = pattern.matcher(messages[i].getFrom()[0].toString());
