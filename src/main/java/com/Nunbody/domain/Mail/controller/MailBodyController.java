@@ -1,6 +1,7 @@
 package com.Nunbody.domain.Mail.controller;
 
 import com.Nunbody.domain.Mail.domain.MailBody;
+import com.Nunbody.domain.Mail.dto.response.MailBodyResponseDto;
 import com.Nunbody.domain.Mail.service.MailService;
 import com.Nunbody.global.common.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,9 @@ public class MailBodyController {
 
     @GetMapping("{id}")
     public ResponseEntity<SuccessResponse<?>> getMailBody(@PathVariable("id") Long mailId){
-        final MailBody mailBody = mailService.getMailBody(mailId);
+        final MailBodyResponseDto mailBodyResponseDto = mailService.getMailBody(mailId);
 
-        return SuccessResponse.ok(mailBody);
+        return SuccessResponse.ok(mailBodyResponseDto);
     }
 
 }
