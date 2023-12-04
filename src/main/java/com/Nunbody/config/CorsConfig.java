@@ -16,7 +16,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:5173");
-//        config.addAllowedOrigin("프론트 도메인");
+        config.addAllowedOrigin("https://www.richam.site/");
         config.addAllowedHeader("*");
         config.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         source.registerCorsConfiguration("/**",config);
