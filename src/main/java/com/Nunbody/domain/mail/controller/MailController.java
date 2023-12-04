@@ -1,5 +1,6 @@
 package com.Nunbody.domain.Mail.controller;
 
+import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailList;
 import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
@@ -26,7 +27,6 @@ public class MailController {
     private final MailService mailService;
     private final MailManageService mailManageService;
     @GetMapping("/mails")
-    @ResponseBody
     public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long userId) {
         final MailList mailList = mailService.getMail(userId);
         return SuccessResponse.ok(mailList);
@@ -40,6 +40,12 @@ public class MailController {
     public ResponseEntity<SuccessResponse<?>> validate(@RequestBody ValidateRequestDto validateRequestDto) throws MessagingException {
         final String string= mailManageService.validateConnect(validateRequestDto);
         return SuccessResponse.ok(string);
+    }
+    @GetMapping("{id}")
+    public ResponseEntity<SuccessResponse<?>> getMailBody(@PathVariable("id") Long mailId){
+        final MailBody mailBody = mailService.getMailBody(mailId);
+
+        return SuccessResponse.ok(mailBody);
     }
 }
 
