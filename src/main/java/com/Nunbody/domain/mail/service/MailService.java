@@ -13,9 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64.Decoder;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Base64;
 
 import javax.mail.internet.MimeMultipart;
 
@@ -50,7 +52,8 @@ public class MailService {
         MailList naverMail = MailList.builder()
                 .userId(userId)
                 .build();
-
+        memberRepository.findNaverIdById(userId);
+        memberRepository.findNaverPasswordById(userId);
         /** naver mail */
         final String naverHost = "imap.naver.com";
 

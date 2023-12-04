@@ -11,6 +11,8 @@ import com.Nunbody.jwt.JwtTokenProvider;
 import com.Nunbody.token.OAuthToken;
 import com.Nunbody.token.TokenInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.Nunbody.global.common.EncoderDecoder;
+import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -56,12 +58,12 @@ public class MemberService {
 
         member = Member.builder()
                 .account(resource.getAccount())
-                .password(passwordEncoder.encode(resource.getPassword()))
+                .password(passwordEncoder.encode(resource.getPassword()));
                 .name(resource.getName())
                 .naverId(resource.getNaverId())
-                .naverPassword(resource.getNaverPassword())
+                .naverPassword(EncoderDecoder.encodeToBase64(resource.getNaverPassword()))
                 .gmailId(resource.getGmailId())
-                .gmailPassword(resource.getGmailPassword())
+                .gmailPassword(EncoderDecoder.encodeToBase64(resource.getGmailPassword()))
                 .refreshToken(null).build();
 
             memberRepository.save(member);
