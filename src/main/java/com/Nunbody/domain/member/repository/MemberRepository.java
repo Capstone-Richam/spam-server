@@ -5,12 +5,13 @@ import com.Nunbody.domain.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByAccount(String account);
-
+    @Query("SELECT m.naverId FROM Member m WHERE m.id = :id")
     Optional<String> findNaverIdById(Long id);
-
-    Optional<String> findNaverPasswordById(Long userId);
+    @Query("SELECT m.naverPassword FROM Member m WHERE m.id = :id")
+    Optional<String> findNaverPasswordById(Long id);
 }

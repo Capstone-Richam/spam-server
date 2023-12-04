@@ -58,7 +58,7 @@ public class MemberService {
 
         member = Member.builder()
                 .account(resource.getAccount())
-                .password(passwordEncoder.encode(resource.getPassword()));
+                .password(passwordEncoder.encode(resource.getPassword()))
                 .name(resource.getName())
                 .naverId(resource.getNaverId())
                 .naverPassword(EncoderDecoder.encodeToBase64(resource.getNaverPassword()))

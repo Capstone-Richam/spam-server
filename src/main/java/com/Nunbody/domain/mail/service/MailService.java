@@ -7,17 +7,16 @@ import com.Nunbody.domain.Mail.dto.response.MailBodyResponseDto;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.Nunbody.domain.member.repository.MemberRepository;
+import com.Nunbody.global.common.EncoderDecoder;
 import com.sun.mail.util.BASE64DecoderStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64.Decoder;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Base64;
 
 import javax.mail.internet.MimeMultipart;
 
@@ -52,15 +51,17 @@ public class MailService {
         MailList naverMail = MailList.builder()
                 .userId(userId)
                 .build();
-        memberRepository.findNaverIdById(userId);
-        memberRepository.findNaverPasswordById(userId);
+
+        String id = memberRepository.findNaverIdById(userId).orElse(null);
+        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findNaverPasswordById(userId).orElse(null));
+
         /** naver mail */
         final String naverHost = "imap.naver.com";
 
-        final String naverId = "haulqogustj@naver.com";
+        final String naverId = id;
 
-        final String naverPassword = "qogustj50@";
-//        naverMail.setHost(host);
+        final String naverPassword = decode;
+
 
         try {
             Properties prop = new Properties();
