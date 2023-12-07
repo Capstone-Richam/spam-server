@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class MailBody {
     @Id
     private String id;
-    @Field(name = "mail_id")
+    @Field(name = "mailId")
     private Long mailId;
     @Field(name = "content")
     private String content;
