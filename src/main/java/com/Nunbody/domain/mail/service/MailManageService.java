@@ -75,4 +75,9 @@ public class MailManageService {
         Store store = session.getStore("imap");
         return store;
     }
+//    public MailListResponseDto filtering(Long memberId){
+//        List<MailHeader> mailList = mailRepository.findAllByMemberId(memberId);
+//
+//    }
+
 }

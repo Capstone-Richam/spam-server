@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface MailRepository extends JpaRepository<MailHeader,Long> {
     Page<MailHeader> findAllByMemberId(Long id, Pageable pageable);
+    List<MailHeader> findAllByMemberId(Long id);
 }
