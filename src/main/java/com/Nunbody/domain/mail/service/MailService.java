@@ -3,9 +3,11 @@ package com.Nunbody.domain.Mail.service;
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.MailList;
+import com.Nunbody.domain.Mail.dto.response.MailBodyResponseDto;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.Nunbody.domain.member.repository.MemberRepository;
+import com.Nunbody.global.common.EncoderDecoder;
 import com.sun.mail.util.BASE64DecoderStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,7 +40,6 @@ public class MailService {
     private final MailBodyRepository mailBodyRepository;
     private final MailRepository mailRepository;
     private final MemberRepository memberRepository;
-
     private final Pattern pattern = Pattern.compile("<(.*?)>");
     private Matcher matcher;
 
@@ -50,13 +51,16 @@ public class MailService {
                 .userId(userId)
                 .build();
 
+        String id = memberRepository.findNaverIdById(userId).orElse(null);
+        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findNaverPasswordById(userId).orElse(null));
+
         /** naver mail */
         final String naverHost = "imap.naver.com";
 
-        final String naverId = "haulqogustj@naver.com";
+        final String naverId = id;
 
-        final String naverPassword = "qogustj50@";
-//        naverMail.setHost(host);
+        final String naverPassword = decode;
+
 
         try {
             Properties prop = new Properties();
@@ -206,7 +210,11 @@ public class MailService {
         return buffer.toByteArray();
     }
 
-    public MailBody getMailBody(Long mailId) {
-        return mailBodyRepository.findByMailId(mailId);
+    public MailBodyResponseDto getMailBody(Long mailId) {
+        MailBody mailBody = mailBodyRepository.findByMailId(mailId);
+        MailBodyResponseDto mailBodyResponseDto = MailBodyResponseDto.builder()
+                .content(mailBody.getContent())
+                .build();
+        return mailBodyResponseDto;
     }
 }

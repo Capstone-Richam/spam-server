@@ -2,6 +2,7 @@ package com.Nunbody.domain.Mail.controller;
 
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailList;
+import com.Nunbody.domain.Mail.dto.response.MailBodyResponseDto;
 import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
 import com.Nunbody.domain.Mail.service.MailManageService;
@@ -43,7 +44,7 @@ public class MailController {
     }
     @GetMapping("{id}")
     public ResponseEntity<SuccessResponse<?>> getMailBody(@PathVariable("id") Long mailId){
-        final MailBody mailBody = mailService.getMailBody(mailId);
+        final MailBodyResponseDto mailBody = mailService.getMailBody(mailId);
 
         return SuccessResponse.ok(mailBody);
     }
