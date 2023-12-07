@@ -40,7 +40,6 @@ public class MailService {
     private final MailBodyRepository mailBodyRepository;
     private final MailRepository mailRepository;
     private final MemberRepository memberRepository;
-
     private final Pattern pattern = Pattern.compile("<(.*?)>");
     private Matcher matcher;
 
