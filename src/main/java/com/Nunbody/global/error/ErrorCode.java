@@ -24,6 +24,11 @@ public enum ErrorCode {
     INVALID_PASSWORD_ERROR(HttpStatus.BAD_REQUEST, "비밀번호를 확인해주세요. 카카오 계정이라면 카카오 로그인으로 시도해주세요."),
     INVALID_ACCESS_TOKEN_ERROR(HttpStatus.BAD_REQUEST,  "AccessToken 정보를 찾을 수 없습니다."),
     INVALID_REFRESH_TOKEN_ERROR(HttpStatus.BAD_REQUEST, "RefreshToken 정보를 찾을 수 없습니다."),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰이 만료되었습니다. 재발급 받아주세요."),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 만료되었습니다. 재발급 받아주세요."),
+    INVALID_REFRESH_TOKEN_VALUE(HttpStatus.UNAUTHORIZED, "리프레시 토큰의 값이 올바르지 않습니다."),
+    INVALID_ACCESS_TOKEN_VALUE(HttpStatus.UNAUTHORIZED, "액세스 토큰의 값이 올바르지 않습니다."),
+    NOT_MATCH_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "일치하지 않는 리프레시 토큰입니다."),
 
     //member
     MEMBER_NOT_EXISTS_ERROR(HttpStatus.BAD_REQUEST,  "존재하지 않는 사용자입니다."),
