@@ -21,7 +21,7 @@ public class MailList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long userId;
+    private Long memberId;
     //@Builder.Default
     //public ArrayList<MailHeader> data = new ArrayList<>();
 
