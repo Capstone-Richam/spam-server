@@ -26,7 +26,7 @@ public class SpringSecurityConfig {
     private final JwtTokenProvider tokenProvider;
     private final ExceptionHandleFilter exceptionFilter;
     private final CorsConfig corsConfig;
-    private static final String[] whiteList = {"/api/member/signup,/api/member/signin"};
+    private static final String[] whiteList = {"/api/member/signup,/api/member/signin,/api/keyword/**"};
 
 
     @Bean

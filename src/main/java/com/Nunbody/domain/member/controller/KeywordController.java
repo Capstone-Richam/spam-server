@@ -36,7 +36,7 @@ public class KeywordController {
         keywordService.addKeyword(memberId,keywordRequestDto);
         return SuccessResponse.ok(null);
     }
-    @DeleteMapping("")
+    @PostMapping("")
     public ResponseEntity<SuccessResponse<?>> deleteKeyword(@MemberId Long memberId, @RequestBody KeywordRequestDto keywordRequestDto){
         keywordService.deleteKeyword(memberId, keywordRequestDto);
         return SuccessResponse.ok(null);
