@@ -2,10 +2,7 @@ package com.Nunbody.jwt;
 
 
 import com.Nunbody.token.TokenInfo;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import javax.naming.AuthenticationException;
+import java.security.Key;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
@@ -44,33 +42,9 @@ public class JwtTokenProvider {
         this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
         this.validityInMilliseconds = validityInMilliseconds;
     }
-    public TokenInfo createAccessToken(Long id) {
-        return createToken(id , ACCESS_TOKEN_VALID_TIME);
-    }
-
-    public TokenInfo createRefreshToken(Long id) {
-        return createToken(id, REFRESH_TOKEN_VALID_TIME);
-    }
 
     // 토큰 생성
-    public TokenInfo createToken(Long id, long validTime) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(id));
 
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + validTime); // 유효기간 계산 (지금으로부터 + 유효시간)
-        logger.info("now: {}", now);
-        logger.info("validity: {}", validity);
-
-        String token = Jwts.builder()
-                .setClaims(claims) // sub 설정
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화방식?
-                .compact();
-
-        token = "Bearer " + token;
-        return new TokenInfo(token, validity.getTime()- now.getTime());
-    }
     public String resolveToken(String token) {
         if(token.startsWith("Bearer ")) {
             return token.replace("Bearer ", "");
@@ -80,6 +54,24 @@ public class JwtTokenProvider {
     public Claims parseClaims(String token) {
         SecretKey secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(baseSecretKey));
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
+    }
+    public TokenInfo issueToken(Long userId) {
+        return TokenInfo.of(generateToken(userId, true), generateToken(userId, false));
+    }
+    private String generateToken(Long userId, boolean isAccessToken) {
+        final Date now = new Date();
+        final Date expiration = new Date(now.getTime() + (isAccessToken ? ACCESS_TOKEN_VALID_TIME : REFRESH_TOKEN_VALID_TIME));
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(now)
+                .setExpiration(expiration)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+    private Key getSigningKey() {
+        String encoded = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        return Keys.hmacShaKeyFor(encoded.getBytes());
     }
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);

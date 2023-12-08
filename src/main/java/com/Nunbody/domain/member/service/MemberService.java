@@ -2,9 +2,9 @@ package com.Nunbody.domain.member.service;
 
 import com.Nunbody.domain.member.domain.Member;
 
-import com.Nunbody.domain.member.repository.MemberRepository;
-import com.Nunbody.domain.member.dto.MemberRegisterResponseDto;
 import com.Nunbody.domain.member.dto.SignInResponseDto;
+import com.Nunbody.domain.member.repository.MemberRepository;
+import com.Nunbody.domain.member.dto.MemberRegisterRequestDto;
 import com.Nunbody.exception.auth.InvalidEmailException;
 import com.Nunbody.exception.auth.InvalidPasswordException;
 import com.Nunbody.jwt.JwtTokenProvider;
@@ -12,7 +12,7 @@ import com.Nunbody.token.OAuthToken;
 import com.Nunbody.token.TokenInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.Nunbody.global.common.EncoderDecoder;
-import java.util.Base64;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -52,7 +52,7 @@ public class MemberService {
         return oAuthToken;
     }
 
-    public void register(MemberRegisterResponseDto resource) {
+    public void register(MemberRegisterRequestDto resource) {
 
         Member member;
 
@@ -76,13 +76,9 @@ public class MemberService {
 
                 throw new InvalidPasswordException("잘못된 비밀번호입니다.");
             }
-
-            TokenInfo accessToken = jwtTokenProvider.createAccessToken(member.getId());
-            TokenInfo refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
-            member.updateRefreshToken(refreshToken.getToken());
-            return new SignInResponseDto(
-                    member.getId(), member.getAccount(), member.getName(), member.getNaverId(), member.getNaverPassword(), member.getGmailId(), member.getGmailPassword(), accessToken.getToken(), refreshToken.getToken(), accessToken.getExpireTime(), refreshToken.getExpireTime()
-            );
+            TokenInfo tokenInfo = oAuthService.issueAccessTokenAndRefreshToken(member);
+            member.updateRefreshToken(tokenInfo.getRefreshToken());
+            return SignInResponseDto.of(member,tokenInfo);
         }
 
     }
