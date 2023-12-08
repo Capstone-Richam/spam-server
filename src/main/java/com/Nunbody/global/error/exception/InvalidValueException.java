@@ -5,7 +5,7 @@ import com.Nunbody.global.error.ErrorCode;
 
 public class InvalidValueException extends BusinessException {
     public InvalidValueException() {
-        super(ErrorCode.IMAP_ERROR);
+        super(ErrorCode.BAD_REQUEST);
     }
 
     public InvalidValueException(ErrorCode errorCode) {

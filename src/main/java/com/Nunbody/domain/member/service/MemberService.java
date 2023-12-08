@@ -9,6 +9,7 @@ import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.domain.member.dto.MemberRegisterRequestDto;
 import com.Nunbody.exception.auth.InvalidEmailException;
 import com.Nunbody.exception.auth.InvalidPasswordException;
+import com.Nunbody.global.error.exception.BusinessException;
 import com.Nunbody.global.error.exception.InvalidValueException;
 import com.Nunbody.jwt.JwtTokenProvider;
 import com.Nunbody.token.OAuthToken;
@@ -100,7 +101,7 @@ public class MemberService {
             boolean isDuplicate = memberRepository.existsByAccount(account);
 
             if (isDuplicate) {
-                throw new InvalidValueException(ACCOUNT_EXISTS_ERROR);
+                throw new BusinessException(ACCOUNT_EXISTS_ERROR);
                 // DuplicateAccountException은 중복 계정이 발견되었을 때 던질 예외 클래스입니다.
                 // 이 예외 클래스는 RuntimeException 또는 다른 적절한 예외 클래스를 상속하여 정의해야 합니다.
             }
