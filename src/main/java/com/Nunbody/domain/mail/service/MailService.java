@@ -24,6 +24,7 @@ import javax.mail.internet.MimeMultipart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -151,7 +152,6 @@ public class MailService {
 
         return mailList;
     }
-
     public MailBody extractMailBody(Message messages, Long mailId) throws MessagingException, IOException {
 
         Object content = messages.getContent();
@@ -172,7 +172,6 @@ public class MailService {
 
         return mailBody;
     }
-
     private static List<byte[]> parseMultipart(Message message, Multipart mp) throws IOException, MessagingException {
         MimeMultipart mm = (MimeMultipart) mp;
 
@@ -189,7 +188,6 @@ public class MailService {
 
         return multipartContentBytes;
     }
-
     private static byte[] combineMultipartContent(List<byte[]> multipartContentBytes) {
         // 여러 BodyPart의 결과를 합치는 로직을 구현
         // 예를 들어, 각 부분을 줄바꿈으로 구분하여 이어붙일 수 있습니다.
@@ -204,7 +202,6 @@ public class MailService {
         // 최종 결과를 byte 배열로 변환
         return combinedContent.toString().getBytes(StandardCharsets.UTF_8);
     }
-
     private static byte[] parseBody(Message message, BodyPart bp) throws IOException, MessagingException {
         Object obj = bp.getContent();
         byte[] contentBytes = null;

@@ -27,6 +27,7 @@ public class MemberController {
     @PostMapping("/signup")
     public ResponseEntity<SuccessResponse<?>> create(@RequestBody MemberRegisterRequestDto dto){
         memberService.register(dto);
+
         return SuccessResponse.ok(null);
     }
 

@@ -7,7 +7,5 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.scheduling.annotation.Async;
 @EnableMongoRepositories
 public interface MailBodyRepository extends MongoRepository<MailBody, String> {
-//    @Async
-//    MailBody findByMailId(Long mail_id);
     MailBody findByMailId(Long id);
 }
