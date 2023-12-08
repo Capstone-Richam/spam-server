@@ -2,6 +2,7 @@ package com.Nunbody.domain.Mail.service;
 
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailHeader;
+import com.Nunbody.domain.Mail.dto.response.FilterMailListResponseDto;
 import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.FilterKeywordRequest;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
@@ -13,14 +14,17 @@ import edu.stanford.nlp.ling.Datum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,15 +38,15 @@ public class FilterService {
     private final MailRepository mailRepository;
     private final MailBodyRepository mailBodyRepository;
 
-    public List<MailListResponseDto> filterContent(FilterKeywordRequest filterKeywordRequest) {
+    public Page<FilterMailListResponseDto> filterContent(FilterKeywordRequest filterKeywordRequest,Pageable pageable) {
 
 
         List<MailHeader> mailList = getMailHeaderList(filterKeywordRequest.getMemberId());
-        List<MailListResponseDto> mailListResponseDtoList = createMailDtoList(mailList,filterKeywordRequest );
+        Page<FilterMailListResponseDto> filterMailListResponseDtoList = createMailDtoPage(mailList,filterKeywordRequest, pageable );
 
-        return mailListResponseDtoList;
+        return filterMailListResponseDtoList;
     }
-    public List<String> categoryFilter(FilterKeywordRequest filterKeywordRequest)throws IOException {
+   /* public List<String> categoryFilter(FilterKeywordRequest filterKeywordRequest)throws IOException {
         List<MailHeader> mailList = getMailHeaderList(filterKeywordRequest.getMemberId());
 
         List<MailHeader> filteredMailList = new ArrayList<>();
@@ -61,9 +65,12 @@ public class FilterService {
 
             // Dataset을 CSV 파일로 저장
             saveDatasetToFile(dataset, filePath);
+            String outputSVMlightFilePath="src/main/resources/data2";
+//            convertCSVtoSVMlight(filePath, outputSVMlightFilePath);
+
             // 텍스트 분류 모델 학습
             ColumnDataClassifier classifier = new ColumnDataClassifier("src/main/resources/prop.txt"); // 프로퍼티 파일을 정의하여 사용
-            classifier.trainClassifier(filePath);
+            classifier.trainClassifier(outputSVMlightFilePath);
 
             // HTML에서 텍스트 추출
             Datum<String, String> extractedText = extractTextFromHtml(htmlContent);
@@ -100,51 +107,128 @@ public class FilterService {
 
         return makeDatum("SomeLabel",extractedText);
         // 생성한 Datum 반환
-    }
-    private List<MailListResponseDto> createMailDtoList(List<MailHeader> mailList, FilterKeywordRequest filterKeywordRequest){
+    }*/
+    private Page<FilterMailListResponseDto> createMailDtoPage(List<MailHeader> mailList, FilterKeywordRequest filterKeywordRequest,Pageable pageable){
         List<MailHeader> filteredMailList = new ArrayList<>();
 
         for (MailHeader mailHeader : mailList) {
             MailBody mailContent = getMailBody(mailHeader.getId());
 
             if (mailContent == null || mailContent.getContent() == null) {
-                // mailContent 또는 그 content가 null일 때 처리할 작업을 수행합니다.
-                // 예를 들어 로그 메시지를 기록하거나 다음 반복을 진행하기 위해 continue 등을 사용할 수 있습니다.
+
                 continue;
             }
             Document doc = Jsoup.parse(mailContent.getContent());
-            Elements links = doc.select("a");
-            links.remove();
 
-            // 다른 필터링 작업을 수행할 수 있음
-            // 예: 특정 태그 내의 내용 중 키워드를 포함하는 부분만 남기고 나머지는 제거
-            Elements paragraphs = doc.select("p");
+            Elements paragraphs = doc.select("div,p,tr,br,span,td,table");
             boolean containsAnyKeyword = false;
+            String topKeyword = null;
+
             for (Element paragraph : paragraphs) {
                 String paragraphText = paragraph.text();
-                // 키워드 중 어느 하나라도 포함하는 경우 해당 부분만 남기고 나머지는 제거
+
                 if (filterKeywordRequest.getKeywords().stream().anyMatch(paragraphText.toLowerCase()::contains)) {
                     paragraph.html(paragraphText);
                     containsAnyKeyword = true;
+
+
+                    String keyword = findTopKeyword(filterKeywordRequest.getKeywords(), paragraphs);
+                    if (keyword != null) {
+                        topKeyword = keyword;
+                    }
                 } else {
-                    paragraph.remove(); // 키워드를 포함하지 않는 경우 해당 요소를 제거
+                    paragraph.remove();
                 }
             }
 
             if (containsAnyKeyword) {
-                // 키워드를 포함하는 경우 해당 mailHeader를 리스트에 추가
+
+                mailHeader.updateTopKeyword(topKeyword);
+
                 filteredMailList.add(mailHeader);
             }
         }
-        return filteredMailList.stream().map(mailHeader -> MailListResponseDto.of(mailHeader))
+
+        List<FilterMailListResponseDto> filterMailListResponseDtoList=createFilterMailListResponseDtoList(filteredMailList);
+        Page<FilterMailListResponseDto> resultPage = new PageImpl<>(filterMailListResponseDtoList, pageable,filterMailListResponseDtoList.size());
+        return resultPage;
+    }
+    private List<FilterMailListResponseDto> createFilterMailListResponseDtoList(List<MailHeader> filteredMailList){
+        return filteredMailList.stream().map(mailHeader -> FilterMailListResponseDto.of(mailHeader, mailHeader.getTopKeyword()))
                 .collect(Collectors.toList());
     }
-//    private Datum<String, String> makeDatum(String label, String feature) {
+    private String findTopKeyword(List<String> keywords, Elements paragraphs) {
+        // 키워드 중에서 paragraphs에서 가장 많이 등장하는 키워드 찾기
+        // 이 부분은 실제 비즈니스 로직 및 알고리즘에 따라 다르게 구현해야 합니다.
+        // 여기서는 간단히 paragraphs에서 각 키워드의 등장 횟수를 세고,
+        // 가장 많이 등장한 키워드를 반환하는 것으로 가정합니다.
+
+        String topKeyword = null;
+        int maxCount = 0;
+
+        for (String keyword : keywords) {
+            int count = countKeywordOccurrences(keyword, paragraphs);
+            if (count > maxCount) {
+                maxCount = count;
+                topKeyword = keyword;
+            }
+        }
+
+        return topKeyword;
+    }
+    private int countKeywordOccurrences(String keyword, Elements paragraphs) {
+        // 실제 키워드 등장 횟수를 세는 로직을 구현
+        // 여기서는 간단히 paragraphs에서 keyword가 등장한 횟수를 세는 것으로 가정
+        int count = 0;
+
+        for (Element paragraph : paragraphs) {
+            String paragraphText = paragraph.text();
+            if (paragraphText.toLowerCase().contains(keyword.toLowerCase())) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+// 나머지 코드는 이전에 설명한대로 유지되어야 합니다.
+
+    //    private Datum<String, String> makeDatum(String label, String feature) {
 //        Datum<String, String> datum = new Datum<>();
 //        datum.label = label;      // 레이블 설정
 //        datum.asFeatures(feature); // 피처 설정
 //        return datum;
 //    }
+    public static void convertCSVtoSVMlight(String inputFilePath, String outputFilePath) {
+    try {
+        BufferedReader br = new BufferedReader(new FileReader(inputFilePath));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath));
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split(",");  // CSV 파일에서 각 줄을 쉼표로 분리
+
+            // 첫 번째 열은 클래스 레이블
+            String label = parts[0].trim();
+            bw.write(label);
+
+            // 나머지는 특성:값 쌍으로 변환하여 추가
+            for (int i = 1; i < parts.length; i++) {
+                String[] featureValuePair = parts[i].split(":");
+                String featureIndex = featureValuePair[0].trim();
+                String featureValue = featureValuePair[1].trim();
+                bw.write(" " + featureIndex + ":" + featureValue);
+            }
+
+
+            bw.newLine();  // 다음 줄로 이동
+        }
+
+        br.close();
+        bw.close();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
     private Datum<String, String> makeDatum(String label, String feature) {
         return new BasicDatum<>(Collections.singleton(label), feature);
     }

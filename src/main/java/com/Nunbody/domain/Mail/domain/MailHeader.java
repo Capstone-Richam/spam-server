@@ -28,8 +28,11 @@ public class MailHeader {
     @Enumerated(EnumType.STRING)
     @Nullable
     private PlatformType platformType;
+    private String topKeyword;
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
-
+    public void updateTopKeyword(String keyword) {
+        this.topKeyword = keyword;
+    }
 }
