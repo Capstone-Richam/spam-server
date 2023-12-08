@@ -29,9 +29,9 @@ public class MailController {
     private final MailService mailService;
     private final MailManageService mailManageService;
     @GetMapping("/mails")
-    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long userId, @RequestBody Map<String,String> type) {
+    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long userId, @RequestParam String type) {
         MailList mailList;
-        String platform = type.get("platform");
+        String platform = type;
 
         if(platform.equals("naver")) {
             mailList = mailService.getNaverMail(userId);
