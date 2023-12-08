@@ -1,6 +1,7 @@
 package com.Nunbody.jwt;
 
 
+import com.Nunbody.global.error.exception.UnauthorizedException;
 import com.Nunbody.token.TokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -26,41 +27,57 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import static com.Nunbody.global.error.ErrorCode.*;
+
 @Slf4j
 @Component
 public class JwtTokenProvider {
 
-    private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
-
+    @Value("${jwt.secret}")
     private String secretKey;
-    private long validityInMilliseconds;
-    private final long ACCESS_TOKEN_VALID_TIME = (1000*60*60*24); //day
-    private final long REFRESH_TOKEN_VALID_TIME = (1000*60*60*24*7); //week
-    @Value("aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789AbCdEfGhIjKlMnOpQrStUvWxYz")
-    private String baseSecretKey;
-    public JwtTokenProvider(@Value("&{security.jwt.token.secret-key}") String secretKey, @Value("${security.jwt.token.expire-length}") long validityInMilliseconds) {
-        this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-        this.validityInMilliseconds = validityInMilliseconds;
-    }
-
-    // 토큰 생성
-
-    public String resolveToken(String token) {
-        if(token.startsWith("Bearer ")) {
-            return token.replace("Bearer ", "");
-        }
-        return null;
-    }
-    public Claims parseClaims(String token) {
-        SecretKey secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(baseSecretKey));
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
-    }
+    @Value("${jwt.access-token-expire-time}")
+    private long ACCESS_TOKEN_EXPIRE_TIME;
+    @Value("${jwt.refresh-token-expire-time}")
+    private long REFRESH_TOKEN_EXPIRE_TIME;
     public TokenInfo issueToken(Long userId) {
         return TokenInfo.of(generateToken(userId, true), generateToken(userId, false));
     }
+
+    public void validateAccessToken(String accessToken) {
+        try {
+            getJwtParser().parseClaimsJws(accessToken);
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(EXPIRED_ACCESS_TOKEN);
+        } catch (Exception e) {
+            throw new UnauthorizedException(INVALID_ACCESS_TOKEN_VALUE);
+        }
+    }
+
+    public void validateRefreshToken(String refreshToken) {
+        try {
+            getJwtParser().parseClaimsJws(refreshToken);
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(EXPIRED_REFRESH_TOKEN);
+        } catch (Exception e) {
+            throw new UnauthorizedException(INVALID_REFRESH_TOKEN_VALUE);
+        }
+    }
+
+    public void equalsRefreshToken(String providedRefreshToken, String storedRefreshToken) {
+        if (!providedRefreshToken.equals(storedRefreshToken)) {
+            throw new UnauthorizedException(NOT_MATCH_REFRESH_TOKEN);
+        }
+    }
+
+    public Long getSubject(String token) {
+        return Long.valueOf(getJwtParser().parseClaimsJws(token)
+                .getBody()
+                .getSubject());
+    }
+
     private String generateToken(Long userId, boolean isAccessToken) {
         final Date now = new Date();
-        final Date expiration = new Date(now.getTime() + (isAccessToken ? ACCESS_TOKEN_VALID_TIME : REFRESH_TOKEN_VALID_TIME));
+        final Date expiration = new Date(now.getTime() + (isAccessToken ? ACCESS_TOKEN_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME));
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setSubject(String.valueOf(userId))
@@ -69,40 +86,15 @@ public class JwtTokenProvider {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
+    private JwtParser getJwtParser() {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build();
+    }
+
     private Key getSigningKey() {
         String encoded = Base64.getEncoder().encodeToString(secretKey.getBytes());
         return Keys.hmacShaKeyFor(encoded.getBytes());
-    }
-    public Authentication getAuthentication(String token) {
-        Claims claims = parseClaims(token);
-        try {
-            claims.get("email");
-        } catch(Exception e) {
-            try {
-                throw new AuthenticationException("Jwt 토큰에 이메일이 존재하지 않습니다.");
-            } catch (AuthenticationException ex) {
-                ex.printStackTrace();
-            }
-        }
-        Collection<GrantedAuthority> authorities =
-                Arrays.stream(claims.get("ROLE_").toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-        UserDetails userDetails = new User(claims.get("email").toString(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-    // 토큰에서 값 추출
-    public Long getSubject(String token) {
-        return Long.valueOf(Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject());
-    }
-
-    // 유효한 토큰인지 확인
-    public boolean validateToken(String token) {
-        Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-        return !claims.getBody().getExpiration().before(new Date());
     }
 }
