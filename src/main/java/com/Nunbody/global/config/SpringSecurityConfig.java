@@ -1,5 +1,6 @@
-package com.Nunbody.config;
+package com.Nunbody.global.config;
 
+import com.Nunbody.global.config.CorsConfig;
 import com.Nunbody.jwt.ExceptionHandleFilter;
 import com.Nunbody.jwt.JwtAuthenticationFilter;
 import com.Nunbody.jwt.JwtTokenProvider;
@@ -15,10 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -29,7 +26,7 @@ public class SpringSecurityConfig {
     private final JwtTokenProvider tokenProvider;
     private final ExceptionHandleFilter exceptionFilter;
     private final CorsConfig corsConfig;
-    private static final String[] whiteList = {"/api/user/**","/api/mail/**", "/api/filter/**","/api/keyword/**"};
+    private static final String[] whiteList = {"/api/member/signup,/api/member/signin"};
 
 
     @Bean

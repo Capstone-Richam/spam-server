@@ -6,6 +6,5 @@ import java.util.List;
 
 @Getter
 public class FilterKeywordRequest {
-    private Long memberId;
     private List<String> keywords;
 }

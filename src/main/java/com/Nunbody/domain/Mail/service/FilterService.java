@@ -6,6 +6,7 @@ import com.Nunbody.domain.Mail.dto.response.FilterMailListResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.FilterKeywordRequest;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
+import com.Nunbody.global.config.auth.MemberId;
 import edu.stanford.nlp.ling.BasicDatum;
 import edu.stanford.nlp.ling.Datum;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +35,10 @@ public class FilterService {
     private final MailRepository mailRepository;
     private final MailBodyRepository mailBodyRepository;
 
-    public Page<FilterMailListResponseDto> filterContent(FilterKeywordRequest filterKeywordRequest,Pageable pageable) {
+    public Page<FilterMailListResponseDto> filterContent( Long memberId,FilterKeywordRequest filterKeywordRequest, Pageable pageable) {
 
 
-        List<MailHeader> mailList = getMailHeaderList(filterKeywordRequest.getMemberId());
+        List<MailHeader> mailList = getMailHeaderList(memberId);
         Page<FilterMailListResponseDto> filterMailListResponseDtoList = createMailDtoPage(mailList,filterKeywordRequest, pageable );
 
         return filterMailListResponseDtoList;

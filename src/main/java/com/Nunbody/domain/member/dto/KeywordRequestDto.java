@@ -5,6 +5,5 @@ import lombok.Data;
 
 @Data
 public class KeywordRequestDto {
-    private Long memberId;
     private List<String> words;
 }

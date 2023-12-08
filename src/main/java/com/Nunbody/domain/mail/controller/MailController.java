@@ -8,6 +8,7 @@ import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
 import com.Nunbody.domain.Mail.service.MailManageService;
 import com.Nunbody.domain.Mail.service.MailService;
 import com.Nunbody.global.common.SuccessResponse;
+import com.Nunbody.global.config.auth.MemberId;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -38,7 +39,7 @@ public class MailController {
         return SuccessResponse.ok(mailList);
     }
     @GetMapping("/header")
-    public ResponseEntity<SuccessResponse<?>> getHeader(@RequestParam Long memberId, @RequestParam String type, @PageableDefault Pageable pageable){
+    public ResponseEntity<SuccessResponse<?>> getHeader(@MemberId Long memberId, @RequestParam String type, @PageableDefault Pageable pageable){
         final Page<MailResponseDto> mailListResponseDtoList = mailManageService.getMailList(memberId,type, pageable);
         return SuccessResponse.ok(mailListResponseDtoList);
     }
