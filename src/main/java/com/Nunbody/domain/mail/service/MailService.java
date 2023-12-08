@@ -111,7 +111,7 @@ public class MailService {
             MailHeader mailHeaderData;
 
 
-            for (int i = 0; i <10 ; i++) {
+            for (int i = 80; i <90 ; i++) {
                 matcher = pattern.matcher(messages[i].getFrom()[0].toString());
                 if (matcher.find()) {
                     String fromPerson = matcher.group(1);
@@ -163,7 +163,7 @@ public class MailService {
 
         MailBody mailBody = MailBody.builder()
                 .mailId(mailId)
-                .content(contentBytes != null ? new String(contentBytes, StandardCharsets.UTF_8) : null)
+                .content(contentBytes != null ? new String(contentBytes, StandardCharsets.UTF_8) : " ")
                 .build();
 
         return mailBody;

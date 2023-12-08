@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 
 @Data
@@ -18,7 +19,7 @@ public class MailBody {
     private String id;
     @Field(name = "mailId")
     private Long mailId;
-    @Field(name = "content")
+    @Field(name = "content", targetType = FieldType.STRING)
     private String content;
 
 
