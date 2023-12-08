@@ -4,7 +4,8 @@ import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.MailList;
 import com.Nunbody.domain.Mail.domain.PlatformType;
-import com.Nunbody.domain.Mail.dto.response.MailBodyResponseDto;
+import com.Nunbody.domain.Mail.dto.response.MailDetailResponseDto;
+import com.Nunbody.domain.Mail.dto.response.MailResponseDto;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.Nunbody.domain.member.domain.Member;
@@ -245,11 +246,16 @@ public class MailService {
         return buffer.toByteArray();
     }
 
-    public MailBodyResponseDto getMailBody(Long mailId) {
+    public MailDetailResponseDto getMailBody(Long mailId) {
         MailBody mailBody = mailBodyRepository.findByMailId(mailId);
-        MailBodyResponseDto mailBodyResponseDto = MailBodyResponseDto.builder()
-                .content(mailBody.getContent())
-                .build();
-        return mailBodyResponseDto;
+        MailResponseDto mailResponseDto = createMailDetailResponseDto(mailId);
+        return MailDetailResponseDto.of(mailResponseDto, mailBody.getContent());
+    }
+    private MailResponseDto createMailDetailResponseDto(Long mailId){
+        MailHeader mailHeader = getMailHeader(mailId);
+        return MailResponseDto.of(mailHeader);
+    }
+    private MailHeader getMailHeader(Long mailId){
+        return mailRepository.findById(mailId).orElse(null);
     }
 }

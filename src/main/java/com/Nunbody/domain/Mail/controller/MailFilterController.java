@@ -1,7 +1,6 @@
 package com.Nunbody.domain.Mail.controller;
 
 import com.Nunbody.domain.Mail.dto.response.FilterMailListResponseDto;
-import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.FilterKeywordRequest;
 import com.Nunbody.domain.Mail.service.FilterService;
 import com.Nunbody.global.common.SuccessResponse;
@@ -11,9 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
