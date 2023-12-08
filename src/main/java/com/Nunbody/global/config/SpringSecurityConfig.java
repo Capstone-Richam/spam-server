@@ -29,7 +29,6 @@ public class SpringSecurityConfig {
     private final CorsConfig corsConfig;
     private static final String[] whiteList = {"/api/member/signup","/api/member/signin"};
 
-
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().antMatchers(whiteList);

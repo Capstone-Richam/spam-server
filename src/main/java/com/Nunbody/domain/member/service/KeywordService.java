@@ -24,7 +24,7 @@ public class KeywordService {
         }
     }
 
-    public void deleteKeyword( Long memberId, KeywordRequestDto keywordRequestDto) {
+    public void deleteKeyword(Long memberId, KeywordRequestDto keywordRequestDto) {
         Keyword keyword = keywordRepository.findByMemberId(memberId).get();
 
         if(keyword!=null){
