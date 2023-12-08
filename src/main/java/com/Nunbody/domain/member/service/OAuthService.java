@@ -1,7 +1,10 @@
 package com.Nunbody.domain.member.service;
 
 
+import com.Nunbody.domain.member.domain.Member;
+import com.Nunbody.jwt.JwtTokenProvider;
 import com.Nunbody.token.OAuthToken;
+import com.Nunbody.token.TokenInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class OAuthService {
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
+    private final JwtTokenProvider jwtProvider;
     @Value("${app.google.client.id}")
     private String GOOGLE_CLIENT_ID;
 
@@ -133,4 +137,8 @@ public class OAuthService {
 //
 //        return objectMapper.readValue(userInfoResponse.getBody(), KakaoUser.class);
 //    }
+
+    public TokenInfo issueAccessTokenAndRefreshToken(Member member) {
+        return jwtProvider.issueToken(member.getId());
+    }
 }
