@@ -1,8 +1,10 @@
 package com.Nunbody.domain.member.service;
 
+import com.Nunbody.domain.member.domain.Keyword;
 import com.Nunbody.domain.member.domain.Member;
 
 import com.Nunbody.domain.member.dto.SignInResponseDto;
+import com.Nunbody.domain.member.repository.KeywordRepository;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.domain.member.dto.MemberRegisterRequestDto;
 import com.Nunbody.exception.auth.InvalidEmailException;
@@ -14,6 +16,7 @@ import com.Nunbody.token.TokenInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.Nunbody.global.common.EncoderDecoder;
 
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -32,6 +35,7 @@ import static com.Nunbody.global.error.ErrorCode.NAME_EXISTS_ERROR;
 public class MemberService {
     private Logger logger = LoggerFactory.getLogger(MemberService.class);
     private final MemberRepository memberRepository;
+    private final KeywordRepository keywordRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final OAuthService oAuthService;
@@ -70,8 +74,14 @@ public class MemberService {
                 .gmailPassword(EncoderDecoder.encodeToBase64(resource.getGmailPassword()))
                 .refreshToken(null).build();
 
-            memberRepository.save(member);
-        }
+        Member keyMember = memberRepository.save(member);
+        Keyword keyword = Keyword.builder()
+                .memberId(keyMember.getId())
+                .words(new ArrayList<>())
+                .build();
+        keywordRepository.save(keyword);
+
+    }
 
         @Transactional
         public SignInResponseDto signIn (String account, String password){
