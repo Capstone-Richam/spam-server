@@ -51,7 +51,7 @@ public class MailController {
         final String string= mailManageService.validateConnect(validateRequestDto);
         return SuccessResponse.ok(string);
     }
-    @GetMapping("{id}")
+    @GetMapping("/header/{id}")
     public ResponseEntity<SuccessResponse<?>> getMailBody(@PathVariable("id") Long mailId){
         final MailBodyResponseDto mailBody = mailService.getMailBody(mailId);
 
