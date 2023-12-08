@@ -1,6 +1,7 @@
 package com.Nunbody.domain.Mail.domain;
 
 import com.Nunbody.domain.member.domain.Member;
+import com.mongodb.lang.Nullable;
 import lombok.*;
 
 
@@ -24,6 +25,9 @@ public class MailHeader {
     private String title;
     private String fromPerson;
     private String date;
+    @Enumerated(EnumType.STRING)
+    @Nullable
+    private PlatfromType platfromType;
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
