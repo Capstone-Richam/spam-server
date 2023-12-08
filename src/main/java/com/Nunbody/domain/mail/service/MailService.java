@@ -3,6 +3,7 @@ package com.Nunbody.domain.Mail.service;
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.MailList;
+import com.Nunbody.domain.Mail.domain.PlatformType;
 import com.Nunbody.domain.Mail.dto.response.MailBodyResponseDto;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
@@ -45,14 +46,14 @@ public class MailService {
 
 
 
-    public MailList getNaverMail(Long userId){
+    public MailList getNaverMail(Long memberId){
 
         MailList naverMail = MailList.builder()
-                .userId(userId)
+                .memberId(memberId)
                 .build();
 
-        String id = memberRepository.findNaverIdById(userId).orElse(null);
-        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findNaverPasswordById(userId).get());
+        String id = memberRepository.findNaverIdById(memberId).orElse(null);
+        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findNaverPasswordById(memberId).get());
 
         /** naver mail */
         final String naverHost = "imap.naver.com";
@@ -61,18 +62,18 @@ public class MailService {
 
         final String naverPassword = decode;
 
-        naverMail = mailSetting(userId,naverHost,naverId,naverPassword,naverMail);
+        naverMail = mailSetting(memberId,naverHost,naverId,naverPassword,naverMail,PlatformType.NAVER);
         return naverMail;
 
     }
-    public MailList getGoogleMail(Long userId){
+    public MailList getGoogleMail(Long memberId){
 
         MailList googleMail = MailList.builder()
-                .userId(userId)
+                .memberId(memberId)
                 .build();
 
-        String id = memberRepository.findGmailIdById(userId).orElse(null);
-        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findGmailPasswordById(userId).get());
+        String id = memberRepository.findGmailIdById(memberId).orElse(null);
+        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findGmailPasswordById(memberId).get());
 
         /** google mail */
         final String googleHost = "imap.gmail.com";
@@ -81,11 +82,12 @@ public class MailService {
 
         final String googlePassword = decode;
 
-        googleMail = mailSetting(userId, googleHost, googleId, googlePassword ,googleMail);
+        googleMail = mailSetting(memberId, googleHost, googleId, googlePassword ,googleMail, PlatformType.GOOGLE);
         return googleMail;
 
     }
-    public MailList mailSetting(Long userId,String platformHost, String platformId, String platformPassword, MailList mailList){
+    public MailList mailSetting(Long userId, String platformHost, String platformId, String platformPassword, MailList mailList,
+                                PlatformType platformType){
         List<MailBody> mailBodies = new ArrayList<>();
 
         try {
@@ -120,6 +122,7 @@ public class MailService {
                             .fromPerson(fromPerson)
                             .date(String.valueOf(messages[i].getReceivedDate()))
                             .member(memberRepository.findById(userId).get())
+                            .platformType(platformType)
                             .build();
                 } else {
                     mailHeaderData = MailHeader.builder()
@@ -127,6 +130,7 @@ public class MailService {
                             .fromPerson(messages[i].getFrom()[0].toString())
                             .date(String.valueOf(messages[i].getReceivedDate()))
                             .member(memberRepository.findById(userId).get())
+                            .platformType(platformType)
                             .build();
                 }
                 mailRepository.save(mailHeaderData);
