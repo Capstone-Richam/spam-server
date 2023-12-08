@@ -39,4 +39,11 @@ public class KeywordService {
             keywordRepository.save(keyword);
         }
     }
+
+    public List<String> getKeyword(Long memberId) {
+        Keyword keyword = keywordRepository.findByMemberId(memberId).orElse(null);
+
+        List<String> words = keyword.getWords();
+        return words;
+    }
 }

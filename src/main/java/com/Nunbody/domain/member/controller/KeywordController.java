@@ -4,6 +4,7 @@ import com.Nunbody.domain.member.domain.Keyword;
 import com.Nunbody.domain.member.dto.KeywordRequestDto;
 import com.Nunbody.domain.member.service.KeywordService;
 import com.Nunbody.global.common.SuccessResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.springframework.data.mongodb.repository.Update;
@@ -24,7 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class KeywordController {
     private final KeywordService keywordService;
     @GetMapping("/{id}")
-    public ResponseEntity<SuccessResponse<?>> geKeyword(@PathVariable Long memberId){
+    public ResponseEntity<SuccessResponse<?>> list(@PathVariable("id") Long memberId){
+        List<String> words = keywordService.getKeyword(memberId);
+        return SuccessResponse.ok(words);
     }
     @PatchMapping("")
     public ResponseEntity<SuccessResponse<?>> updateKeyword(@RequestBody KeywordRequestDto keywordRequestDto){
