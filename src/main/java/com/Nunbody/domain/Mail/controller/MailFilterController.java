@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -19,5 +20,11 @@ public class MailFilterController {
     public ResponseEntity<SuccessResponse<?>> filtertest(@RequestBody FilterKeywordRequest filterKeywordRequest){
         List<MailListResponseDto> mailListResponseDtoList = filterService.filterContent(filterKeywordRequest);
         return SuccessResponse.ok(mailListResponseDtoList);
+    }
+
+    @PostMapping("/nlp")
+    public ResponseEntity<SuccessResponse<?>> nlpFilter(@RequestBody FilterKeywordRequest filterKeywordRequest) throws IOException {
+        List<String> list = filterService.categoryFilter(filterKeywordRequest);
+        return SuccessResponse.ok(list);
     }
 }
