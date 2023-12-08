@@ -45,9 +45,11 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
+
 	//standard NLP
 	implementation 'edu.stanford.nlp:stanford-corenlp:4.5.3'
 	//jsoup
+
 	implementation 'org.jsoup:jsoup:1.17.1'
 }
 
