@@ -2,17 +2,18 @@ package com.Nunbody.domain.member.service;
 
 import com.Nunbody.domain.member.domain.Member;
 
-import com.Nunbody.domain.member.repository.MemberRepository;
-import com.Nunbody.domain.member.dto.MemberRegisterResponseDto;
 import com.Nunbody.domain.member.dto.SignInResponseDto;
+import com.Nunbody.domain.member.repository.MemberRepository;
+import com.Nunbody.domain.member.dto.MemberRegisterRequestDto;
 import com.Nunbody.exception.auth.InvalidEmailException;
 import com.Nunbody.exception.auth.InvalidPasswordException;
+import com.Nunbody.global.error.exception.InvalidValueException;
 import com.Nunbody.jwt.JwtTokenProvider;
 import com.Nunbody.token.OAuthToken;
 import com.Nunbody.token.TokenInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.Nunbody.global.common.EncoderDecoder;
-import java.util.Base64;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -21,6 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.Nunbody.global.error.ErrorCode.ACCOUNT_EXISTS_ERROR;
+import static com.Nunbody.global.error.ErrorCode.NAME_EXISTS_ERROR;
 
 @Slf4j
 @Service
@@ -52,7 +56,7 @@ public class MemberService {
         return oAuthToken;
     }
 
-    public void register(MemberRegisterResponseDto resource) {
+    public void register(MemberRegisterRequestDto resource) {
 
         Member member;
 
@@ -76,13 +80,29 @@ public class MemberService {
 
                 throw new InvalidPasswordException("잘못된 비밀번호입니다.");
             }
-
-            TokenInfo accessToken = jwtTokenProvider.createAccessToken(member.getId());
-            TokenInfo refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
-            member.updateRefreshToken(refreshToken.getToken());
-            return new SignInResponseDto(
-                    member.getId(), member.getAccount(), member.getName(), member.getNaverId(), member.getNaverPassword(), member.getGmailId(), member.getGmailPassword(), accessToken.getToken(), refreshToken.getToken(), accessToken.getExpireTime(), refreshToken.getExpireTime()
-            );
+            TokenInfo tokenInfo = oAuthService.issueAccessTokenAndRefreshToken(member);
+            member.updateRefreshToken(tokenInfo.getRefreshToken());
+            return SignInResponseDto.of(member,tokenInfo);
         }
 
+        public void validateAccount(String account){
+
+            boolean isDuplicate = memberRepository.existsByAccount(account);
+
+            if (isDuplicate) {
+                throw new InvalidValueException(ACCOUNT_EXISTS_ERROR);
+                // DuplicateAccountException은 중복 계정이 발견되었을 때 던질 예외 클래스입니다.
+                // 이 예외 클래스는 RuntimeException 또는 다른 적절한 예외 클래스를 상속하여 정의해야 합니다.
+            }
+        }
+    public void validateName(String name){
+
+        boolean isDuplicate = memberRepository.existsByName(name);
+
+        if (isDuplicate) {
+            throw new InvalidValueException(NAME_EXISTS_ERROR);
+            // DuplicateAccountException은 중복 계정이 발견되었을 때 던질 예외 클래스입니다.
+            // 이 예외 클래스는 RuntimeException 또는 다른 적절한 예외 클래스를 상속하여 정의해야 합니다.
+        }
+    }
     }

@@ -107,6 +107,11 @@ public class FilterService {
         for (MailHeader mailHeader : mailList) {
             MailBody mailContent = getMailBody(mailHeader.getId());
 
+            if (mailContent == null || mailContent.getContent() == null) {
+                // mailContent 또는 그 content가 null일 때 처리할 작업을 수행합니다.
+                // 예를 들어 로그 메시지를 기록하거나 다음 반복을 진행하기 위해 continue 등을 사용할 수 있습니다.
+                continue;
+            }
             Document doc = Jsoup.parse(mailContent.getContent());
             Elements links = doc.select("a");
             links.remove();

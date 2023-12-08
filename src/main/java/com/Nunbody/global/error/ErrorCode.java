@@ -18,6 +18,8 @@ public enum ErrorCode {
     //auth
     IMAP_ERROR(HttpStatus.CONFLICT,  " IMAP 설정을 해주세요"),
     EMAIL_EXISTS_ERROR(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다."),
+    ACCOUNT_EXISTS_ERROR(HttpStatus.PRECONDITION_FAILED, "이미 존재하는 아이디입니다."),
+    NAME_EXISTS_ERROR(HttpStatus.PAYLOAD_TOO_LARGE, "이미 존재하는 닉네임입니다."),
     INVALID_EMAIL_ERROR(HttpStatus.GONE, "존재하지 않는 이메일 정보입니다."),
     INVALID_PASSWORD_ERROR(HttpStatus.BAD_REQUEST, "비밀번호를 확인해주세요. 카카오 계정이라면 카카오 로그인으로 시도해주세요."),
     INVALID_ACCESS_TOKEN_ERROR(HttpStatus.BAD_REQUEST,  "AccessToken 정보를 찾을 수 없습니다."),

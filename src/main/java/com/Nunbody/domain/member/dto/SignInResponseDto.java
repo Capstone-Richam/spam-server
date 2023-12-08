@@ -1,27 +1,28 @@
 package com.Nunbody.domain.member.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.Nunbody.domain.member.domain.Member;
+import com.Nunbody.token.TokenInfo;
+import lombok.*;
 
 
-@AllArgsConstructor
-@Data
+
+@Getter
+@Builder
 public class SignInResponseDto {
-    private Long memberId;
-    private String account;
-   // private String password;
-    private String name;
     private String naverId;
-    private String naverPassword;
-
     private String gmailId;
-    private String gmailPassword;
-
-
     private String accessToken;
     private String refreshToken;
-    private Long accessTokenRemainTime;
-    private Long refreshTokenRemainTime;
+
+    public static SignInResponseDto of(Member member, TokenInfo tokenInfo){
+        return SignInResponseDto.builder()
+                .naverId(member.getNaverId())
+                .gmailId(member.getGmailId())
+                .accessToken(tokenInfo.getAccessToken())
+                .refreshToken(member.getRefreshToken())
+                .build();
+
+
+    }
 }

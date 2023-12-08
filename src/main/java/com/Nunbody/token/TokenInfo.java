@@ -10,6 +10,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TokenInfo {
-    private String token;
-    private Long expireTime;
+    private String accessToken;
+    private String refreshToken;
+
+    public static TokenInfo of(String accessToken, String refreshToken) {
+        return new TokenInfo(accessToken, refreshToken);
+    }
 }
