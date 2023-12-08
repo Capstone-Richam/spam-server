@@ -45,9 +45,9 @@ public class MemberController {
         if(validateRequestDto.getAorn().equals("nickname"))memberService.validateName(validateRequestDto.getContent());
         return SuccessResponse.ok(null);
     }
-    @PatchMapping("/signout")
-    public ResponseEntity<SuccessResponse<?>> signOut(@MemberId final Long memberId) {
-        memberService.signOut(memberId);
-        return SuccessResponse.ok(null);
-    }
+//    @PatchMapping("/signout")
+//    public ResponseEntity<SuccessResponse<?>> signOut(@MemberId final Long memberId) {
+//        memberService.signOut(memberId);
+//        return SuccessResponse.ok(null);
+//    }
 }
