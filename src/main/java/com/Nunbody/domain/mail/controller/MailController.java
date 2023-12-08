@@ -2,6 +2,7 @@ package com.Nunbody.domain.Mail.controller;
 
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailList;
+import com.Nunbody.domain.Mail.domain.PlatformType;
 import com.Nunbody.domain.Mail.dto.response.MailBodyResponseDto;
 import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
@@ -29,15 +30,15 @@ public class MailController {
     private final MailService mailService;
     private final MailManageService mailManageService;
     @GetMapping("/mails")
-    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long userId, @RequestParam String type) {
+    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long memberId, @RequestParam String type) {
         MailList mailList;
         String platform = type;
 
-        if(platform.equals("naver")) {
-            mailList = mailService.getNaverMail(userId);
+        if(platform.equals(PlatformType.NAVER)) {
+            mailList = mailService.getNaverMail(memberId);
         }
         else {
-            mailList = mailService.getGoogleMail(userId);
+            mailList = mailService.getGoogleMail(memberId);
         }
         return SuccessResponse.ok(mailList);
     }

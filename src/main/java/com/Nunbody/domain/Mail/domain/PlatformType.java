@@ -12,10 +12,11 @@ public enum PlatformType {
     NAVER("NAVER"),
     GOOGLE("GOOGLE");
 
-    private final String stringPlatfromType;
-    public static PlatformType getEnumPlatfromTypeFromStringPlatfromType(String stringPlatfromType) {
+
+    private final String stringPlatformType;
+    public static PlatformType getEnumPlatformTypeFromStringPlatformType(String stringPlatformType) {
         return Arrays.stream(values())
-                .filter(platformType -> platformType.stringPlatfromType.equals(stringPlatfromType))
+                .filter(platformType -> platformType.stringPlatformType.equals(stringPlatformType))
                 .findFirst()
                 .orElseThrow(null);
     }

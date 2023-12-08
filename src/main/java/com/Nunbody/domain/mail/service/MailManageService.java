@@ -44,7 +44,7 @@ public class MailManageService {
             return mailHeaderPage.map(mailHeader -> MailListResponseDto.of(mailHeader));
 
         }
-        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdAndPlatformType(memberId, PlatformType.getEnumPlatfromTypeFromStringPlatfromType(type),pageable);
+        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdAndPlatformType(memberId, PlatformType.getEnumPlatformTypeFromStringPlatformType(type),pageable);
         return mailHeaderPage.map(mailHeader -> MailListResponseDto.of(mailHeader));
     }
     public String validateConnect(ValidateRequestDto validateRequestDto) throws MessagingException {
