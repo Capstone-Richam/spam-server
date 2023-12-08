@@ -41,7 +41,7 @@ public class FilterService {
     public Page<FilterMailListResponseDto> filterContent(FilterKeywordRequest filterKeywordRequest,Pageable pageable) {
 
 
-        Page<MailHeader> mailList = getMailHeaderList(filterKeywordRequest.getMemberId(),pageable);
+        List<MailHeader> mailList = getMailHeaderList(filterKeywordRequest.getMemberId());
         Page<FilterMailListResponseDto> filterMailListResponseDtoList = createMailDtoPage(mailList,filterKeywordRequest, pageable );
 
         return filterMailListResponseDtoList;
@@ -108,55 +108,49 @@ public class FilterService {
         return makeDatum("SomeLabel",extractedText);
         // 생성한 Datum 반환
     }*/
-    private Page<FilterMailListResponseDto> createMailDtoPage(Page<MailHeader> mailList, FilterKeywordRequest filterKeywordRequest,Pageable pageable){
+    private Page<FilterMailListResponseDto> createMailDtoPage(List<MailHeader> mailList, FilterKeywordRequest filterKeywordRequest,Pageable pageable){
         List<MailHeader> filteredMailList = new ArrayList<>();
 
         for (MailHeader mailHeader : mailList) {
             MailBody mailContent = getMailBody(mailHeader.getId());
 
             if (mailContent == null || mailContent.getContent() == null) {
-                // mailContent 또는 그 content가 null일 때 처리할 작업을 수행합니다.
-                // 예를 들어 로그 메시지를 기록하거나 다음 반복을 진행하기 위해 continue 등을 사용할 수 있습니다.
+
                 continue;
             }
             Document doc = Jsoup.parse(mailContent.getContent());
-            Elements links = doc.select("a");
-            links.remove();
 
-            // 다른 필터링 작업을 수행할 수 있음
-            // 예: 특정 태그 내의 내용 중 키워드를 포함하는 부분만 남기고 나머지는 제거
-            Elements paragraphs = doc.select("div,p,tr");
+            Elements paragraphs = doc.select("div,p,tr,br,span,td,table");
             boolean containsAnyKeyword = false;
-            String topKeyword = null; // 가장 많이 나온 키워드 초기화
+            String topKeyword = null;
 
             for (Element paragraph : paragraphs) {
                 String paragraphText = paragraph.text();
 
-                // 키워드 중 어느 하나라도 포함하는 경우 해당 부분만 남기고 나머지는 제거
                 if (filterKeywordRequest.getKeywords().stream().anyMatch(paragraphText.toLowerCase()::contains)) {
                     paragraph.html(paragraphText);
                     containsAnyKeyword = true;
 
-                    // topKeyword 추출 로직 추가
+
                     String keyword = findTopKeyword(filterKeywordRequest.getKeywords(), paragraphs);
                     if (keyword != null) {
                         topKeyword = keyword;
                     }
                 } else {
-                    paragraph.remove(); // 키워드를 포함하지 않는 경우 해당 요소를 제거
+                    paragraph.remove();
                 }
             }
 
             if (containsAnyKeyword) {
-                // 키워드를 포함하는 경우 해당 mailHeader에 topKeyword 설정
+
                 mailHeader.updateTopKeyword(topKeyword);
-                // 키워드를 포함하는 경우 해당 mailHeader를 리스트에 추가
+
                 filteredMailList.add(mailHeader);
             }
         }
 
         List<FilterMailListResponseDto> filterMailListResponseDtoList=createFilterMailListResponseDtoList(filteredMailList);
-        Page<FilterMailListResponseDto> resultPage = new PageImpl<>(filterMailListResponseDtoList, pageable,filteredMailList.size());
+        Page<FilterMailListResponseDto> resultPage = new PageImpl<>(filterMailListResponseDtoList, pageable,filterMailListResponseDtoList.size());
         return resultPage;
     }
     private List<FilterMailListResponseDto> createFilterMailListResponseDtoList(List<MailHeader> filteredMailList){
@@ -238,8 +232,8 @@ public class FilterService {
     private Datum<String, String> makeDatum(String label, String feature) {
         return new BasicDatum<>(Collections.singleton(label), feature);
     }
-    private Page<MailHeader> getMailHeaderList(Long memberId, Pageable pageable){
-        return mailRepository.findAllByMemberId(memberId,pageable);
+    private List<MailHeader> getMailHeaderList(Long memberId){
+        return mailRepository.findAllByMemberId(memberId);
     }
     private MailBody getMailBody(Long mailId){
         return mailBodyRepository.findByMailId(mailId);
