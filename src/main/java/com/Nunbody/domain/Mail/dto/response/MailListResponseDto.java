@@ -12,7 +12,7 @@ public class MailListResponseDto {
     private String title;
     private String fromPerson;
     private String date;
-    private PlatformType type;
+    private String type;
 
     public static MailListResponseDto of(MailHeader mailHeader){
         return MailListResponseDto.builder()
@@ -20,7 +20,7 @@ public class MailListResponseDto {
                 .title(mailHeader.getTitle())
                 .fromPerson(mailHeader.getFromPerson())
                 .date(mailHeader.getDate())
-                .type(mailHeader.getPlatformType())
+                .type(mailHeader.getPlatformType().toString())
                 .build();
     }
 }

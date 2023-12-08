@@ -2,10 +2,13 @@ package com.Nunbody.domain.Mail.service;
 
 
 import com.Nunbody.domain.Mail.domain.MailHeader;
+import com.Nunbody.domain.Mail.domain.PlatformType;
 import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 
+import com.Nunbody.domain.member.domain.Member;
+import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.global.error.exception.InvalidValueException;
 import com.Nunbody.global.error.exception.LoginException;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +32,27 @@ import static com.Nunbody.global.error.ErrorCode.*;
 @Service
 public class MailManageService {
     private final MailRepository mailRepository;
-    public Page<MailListResponseDto> getMailList(Long id, Pageable pageable){
-
-        Page<MailListResponseDto> mailListResponseDtoList = createMailListResponseDtoList(id,pageable);
+    private final MemberRepository memberRepository;
+    public Page<MailListResponseDto> getMailList(Long memberId, String type, Pageable pageable){
+        Member member =getMember(memberId);
+        Page<MailListResponseDto> mailListResponseDtoList = createMailListResponseDtoList(memberId,type,pageable);
         return mailListResponseDtoList;
     }
-    private Page<MailListResponseDto> createMailListResponseDtoList(Long memberId, Pageable pageable){
-        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberId(memberId, pageable);
+    private Page<MailListResponseDto> createMailListResponseDtoList(Long memberId, String type,Pageable pageable){
+        if(type.isEmpty()){
+            Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberId(memberId, pageable);
+            return mailHeaderPage.map(mailHeader -> MailListResponseDto.of(mailHeader));
+
+        }
+        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdAndPlatformType(memberId, PlatformType.getEnumPlatformTypeFromStringPlatformType(type),pageable);
         return mailHeaderPage.map(mailHeader -> MailListResponseDto.of(mailHeader));
     }
     public String validateConnect(ValidateRequestDto validateRequestDto) throws MessagingException {
         String validate = validateImap(validateRequestDto);
         return validate;
+    }
+    private Member getMember(Long memberId){
+        return memberRepository.findById(memberId).orElse(null);
     }
     private String validateImap(ValidateRequestDto validateRequestDto) throws MessagingException {
         try {

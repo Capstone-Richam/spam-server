@@ -43,8 +43,8 @@ public class MailController {
         return SuccessResponse.ok(mailList);
     }
     @GetMapping("/header")
-    public ResponseEntity<SuccessResponse<?>> getHeader(@RequestParam Long memberId, @PageableDefault Pageable pageable){
-        final Page<MailListResponseDto> mailListResponseDtoList = mailManageService.getMailList(memberId, pageable);
+    public ResponseEntity<SuccessResponse<?>> getHeader(@RequestParam Long memberId, @RequestParam String type, @PageableDefault Pageable pageable){
+        final Page<MailListResponseDto> mailListResponseDtoList = mailManageService.getMailList(memberId,type, pageable);
         return SuccessResponse.ok(mailListResponseDtoList);
     }
     @PostMapping("/validate")
