@@ -18,4 +18,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<String> findGmailIdById(Long id);
     @Query("SELECT m.gmailPassword FROM Member m WHERE m.id = :id")
     Optional<String> findGmailPasswordById(Long id);
+    boolean existsByAccount(String account);
+    boolean existsByName(String name);
 }

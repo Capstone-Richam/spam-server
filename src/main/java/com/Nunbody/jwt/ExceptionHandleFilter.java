@@ -59,6 +59,18 @@ public class ExceptionHandleFilter extends OncePerRequestFilter {
                             ErrorCode.IMAP_ERROR,
                             request, response, "IMAP/SMTP 설정을 확인하세요.", "DEFAULT-ERROR-01"
                     );
+                } else if (errorMessage.contains("이미 존재하는 아이디입니다")) {
+                     setErrorResponse(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            ErrorCode.ACCOUNT_EXISTS_ERROR,
+                            request, response, "아이디 중복.", "DEFAULT-ERROR-01"
+                    );
+                }else if (errorMessage.contains("이미 존재하는 닉네임입니다")) {
+                    setErrorResponse(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            ErrorCode.NAME_EXISTS_ERROR,
+                            request, response, "닉네임 중복.", "DEFAULT-ERROR-01"
+                    );
                 }
             }
         }
