@@ -8,6 +8,7 @@ import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
 import com.Nunbody.domain.Mail.service.MailManageService;
 import com.Nunbody.domain.Mail.service.MailService;
 import com.Nunbody.global.common.SuccessResponse;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -28,8 +29,16 @@ public class MailController {
     private final MailService mailService;
     private final MailManageService mailManageService;
     @GetMapping("/mails")
-    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long userId) {
-        final MailList mailList = mailService.getMail(userId);
+    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long userId, @RequestBody Map<String,String> type) {
+        MailList mailList;
+        String platform = type.get("platform");
+
+        if(platform.equals("naver")) {
+            mailList = mailService.getNaverMail(userId);
+        }
+        else {
+            mailList = mailService.getGoogleMail(userId);
+        }
         return SuccessResponse.ok(mailList);
     }
     @GetMapping("/header")

@@ -22,10 +22,10 @@ public class MailList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long userId;
-    @Builder.Default
-    public ArrayList<MailHeader> data = new ArrayList<>();
+    //@Builder.Default
+    //public ArrayList<MailHeader> data = new ArrayList<>();
 
-    public void addData(MailHeader mailHeader) {
+    /*public void addData(MailHeader mailHeader) {
         data.add(mailHeader);
-    }
+    }*/
 }

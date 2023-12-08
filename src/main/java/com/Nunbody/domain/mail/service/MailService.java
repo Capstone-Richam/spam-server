@@ -45,14 +45,14 @@ public class MailService {
 
 
 
-    public MailList getMail(Long userId){
-        List<MailBody> mailBodies = new ArrayList<>();
+    public MailList getNaverMail(Long userId){
+
         MailList naverMail = MailList.builder()
                 .userId(userId)
                 .build();
 
         String id = memberRepository.findNaverIdById(userId).orElse(null);
-        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findNaverPasswordById(userId).orElse(null));
+        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findNaverPasswordById(userId).get());
 
         /** naver mail */
         final String naverHost = "imap.naver.com";
@@ -61,10 +61,36 @@ public class MailService {
 
         final String naverPassword = decode;
 
+        naverMail = mailSetting(userId,naverHost,naverId,naverPassword,naverMail);
+        return naverMail;
+
+    }
+    public MailList getGoogleMail(Long userId){
+
+        MailList googleMail = MailList.builder()
+                .userId(userId)
+                .build();
+
+        String id = memberRepository.findGmailIdById(userId).orElse(null);
+        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findGmailPasswordById(userId).get());
+
+        /** google mail */
+        final String googleHost = "imap.gmail.com";
+
+        final String googleId = id;
+
+        final String googlePassword = decode;
+
+        googleMail = mailSetting(userId, googleHost, googleId, googlePassword ,googleMail);
+        return googleMail;
+
+    }
+    public MailList mailSetting(Long userId,String platformHost, String platformId, String platformPassword, MailList mailList){
+        List<MailBody> mailBodies = new ArrayList<>();
 
         try {
             Properties prop = new Properties();
-            prop.put("mail.imap.host", naverHost);
+            prop.put("mail.imap.host", platformHost);
             prop.put("mail.imap.port", 993);
             prop.put("mail.imap.ssl.enable", "true");
             prop.put("mail.imap.ssl.protocols", "TLSv1.2");
@@ -75,17 +101,17 @@ public class MailService {
 
             // Store 클래스
             Store store = session.getStore("imap");
-            store.connect(naverHost, naverId, naverPassword);
+            store.connect(platformHost,platformId,platformPassword);
 
             // 받은 편지함
-            Folder folder = store.getFolder("INBOX");
+            Folder folder = store.getFolder("inbox");
             folder.open(Folder.READ_ONLY);
 
             Message[] messages = folder.getMessages();
             MailHeader mailHeaderData;
 
 
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i <10 ; i++) {
                 matcher = pattern.matcher(messages[i].getFrom()[0].toString());
                 if (matcher.find()) {
                     String fromPerson = matcher.group(1);
@@ -93,15 +119,18 @@ public class MailService {
                             .title(messages[i].getSubject())
                             .fromPerson(fromPerson)
                             .date(String.valueOf(messages[i].getReceivedDate()))
+                            .member(memberRepository.findById(userId).get())
                             .build();
                 } else {
                     mailHeaderData = MailHeader.builder()
                             .title(messages[i].getSubject())
                             .fromPerson(messages[i].getFrom()[0].toString())
+                            .date(String.valueOf(messages[i].getReceivedDate()))
+                            .member(memberRepository.findById(userId).get())
                             .build();
                 }
                 mailRepository.save(mailHeaderData);
-                naverMail.addData(mailHeaderData);
+                //mailList.addData(mailHeaderData);
 
                 Long mailId = mailHeaderData.getId();
                 mailBodies.add(extractMailBody(messages[i],mailId));
@@ -116,7 +145,7 @@ public class MailService {
             e.printStackTrace();
         }
 
-        return naverMail;
+        return mailList;
     }
 
     public MailBody extractMailBody(Message messages, Long mailId) throws MessagingException, IOException {
