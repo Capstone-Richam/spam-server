@@ -8,6 +8,7 @@ import com.Nunbody.domain.member.dto.ValidateRequestDto;
 import com.Nunbody.domain.member.service.MemberService;
 
 import com.Nunbody.global.common.SuccessResponse;
+import com.Nunbody.global.config.auth.MemberId;
 import com.Nunbody.token.OAuthToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,11 @@ public class MemberController {
     public ResponseEntity<SuccessResponse<?>> validateMember(@RequestBody ValidateRequestDto validateRequestDto){
         if(validateRequestDto.getAorn().equals("account"))memberService.validateAccount(validateRequestDto.getContent());
         if(validateRequestDto.getAorn().equals("nickname"))memberService.validateName(validateRequestDto.getContent());
+        return SuccessResponse.ok(null);
+    }
+    @PatchMapping("/signout")
+    public ResponseEntity<SuccessResponse<?>> signOut(@MemberId final Long memberId) {
+        memberService.signOut(memberId);
         return SuccessResponse.ok(null);
     }
 }

@@ -41,6 +41,7 @@ public enum ErrorCode {
     /**
      * 404 Not Found
      */
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "엔티티를 찾을 수 없습니다."),
     /**
      * 409 Conflict
