@@ -7,6 +7,7 @@ import com.Nunbody.domain.Mail.domain.PlatformType;
 import com.Nunbody.domain.Mail.dto.response.MailBodyResponseDto;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
+import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.global.common.EncoderDecoder;
 import com.sun.mail.util.BASE64DecoderStream;
@@ -72,9 +73,9 @@ public class MailService {
         MailList googleMail = MailList.builder()
                 .memberId(memberId)
                 .build();
-
-        String id = memberRepository.findGmailIdById(memberId).orElse(null);
-        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findGmailPasswordById(memberId).get());
+        Member member = memberRepository.findById(memberId).orElse(null);
+        String id = member.getGmailId();
+        String decode  = EncoderDecoder.decodeFromBase64(member.getGmailPassword());
 
         /** google mail */
         final String googleHost = "imap.gmail.com";
@@ -161,7 +162,8 @@ public class MailService {
             List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
             // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
             contentBytes = combineMultipartContent(multipartContentBytes);
-        } else if(content instanceof Part){
+        } else
+            if(content instanceof Part){
             contentBytes = parseBody(messages, (BodyPart) content);
         }
 
