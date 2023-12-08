@@ -8,14 +8,14 @@ import java.util.Arrays;
 
 @RequiredArgsConstructor
 @Getter
-public enum PlatfromType {
+public enum PlatformType {
     NAVER("NAVER"),
     GOOGLE("GOOGLE");
 
     private final String stringPlatfromType;
-    public static PlatfromType getEnumPlatfromTypeFromStringPlatfromType(String stringPlatfromType) {
+    public static PlatformType getEnumPlatfromTypeFromStringPlatfromType(String stringPlatfromType) {
         return Arrays.stream(values())
-                .filter(platfromType -> platfromType.stringPlatfromType.equals(stringPlatfromType))
+                .filter(platformType -> platformType.stringPlatfromType.equals(stringPlatfromType))
                 .findFirst()
                 .orElseThrow(null);
     }

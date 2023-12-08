@@ -27,7 +27,7 @@ public class MailHeader {
     private String date;
     @Enumerated(EnumType.STRING)
     @Nullable
-    private PlatfromType platfromType;
+    private PlatformType platformType;
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
