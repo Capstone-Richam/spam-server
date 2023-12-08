@@ -44,6 +44,8 @@ dependencies {
 	//DB gradle
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+	implementation 'org.jsoup:jsoup:1.17.1'
 }
 
 tasks.named('test') {
