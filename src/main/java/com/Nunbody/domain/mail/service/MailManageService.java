@@ -35,11 +35,11 @@ public class MailManageService {
     }
     private Page<MailResponseDto> createMailListResponseDtoList(Long memberId, String type, Pageable pageable){
         if(type.equals("ALL")){
-            Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberId(memberId, pageable);
+            Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdOrderByDate(memberId, pageable);
             return mailHeaderPage.map(mailHeader -> MailResponseDto.of(mailHeader));
 
         }
-        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdAndPlatformType(memberId, PlatformType.getEnumPlatformTypeFromStringPlatformType(type),pageable);
+        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdAndPlatformTypeOrderByDate(memberId, PlatformType.getEnumPlatformTypeFromStringPlatformType(type),pageable);
         return mailHeaderPage.map(mailHeader -> MailResponseDto.of(mailHeader));
     }
     public String validateConnect(ValidateRequestDto validateRequestDto) throws MessagingException {
