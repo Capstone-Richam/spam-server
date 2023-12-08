@@ -1,32 +1,33 @@
 package com.Nunbody.global.config;
 
 import com.Nunbody.global.config.CorsConfig;
-import com.Nunbody.jwt.ExceptionHandleFilter;
+import com.Nunbody.global.config.auth.ExceptionHandlerFilter;
+import com.Nunbody.global.config.auth.JwtAuthenticationEntryPoint;
+
 import com.Nunbody.jwt.JwtAuthenticationFilter;
 import com.Nunbody.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@Configuration
-@EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity
+@Configuration
 public class SpringSecurityConfig {
-
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtTokenProvider tokenProvider;
-    private final ExceptionHandleFilter exceptionFilter;
     private final CorsConfig corsConfig;
-    private static final String[] whiteList = {"/api/member/signup,/api/member/signin"};
+    private static final String[] whiteList = {"/api/member/signup","/api/member/signin"};
 
 
     @Bean
@@ -35,21 +36,20 @@ public class SpringSecurityConfig {
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .httpBasic().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-//                    .antMatchers("/auth/**").permitAll()
-//                    .anyRequest().authenticated()
-                .anyRequest().permitAll()
-                .and()
+        return http
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sessionManagementConfigurer ->
+                        sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptionHandlingConfigurer ->
+                        exceptionHandlingConfigurer.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
+                        authorizationManagerRequestMatcherRegistry.anyRequest().authenticated())
                 .addFilter(corsConfig.corsFilter())
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(exceptionFilter, JwtAuthenticationFilter.class);
-
-        return http.build();
+                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

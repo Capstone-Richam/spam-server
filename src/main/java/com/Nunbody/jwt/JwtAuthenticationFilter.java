@@ -1,10 +1,15 @@
 package com.Nunbody.jwt;
 
+import com.Nunbody.global.config.auth.MemberAuthentication;
+import com.Nunbody.global.error.ErrorCode;
+import com.Nunbody.global.error.exception.UnauthorizedException;
 import com.Nunbody.jwt.exception.EmptyTokenException;
 import com.Nunbody.jwt.exception.InvalidTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -16,23 +21,28 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    public static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String BEARER = "Bearer ";
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (bearerToken==null) {
-            throw new EmptyTokenException("Authorization 헤더에 토큰이 없습니다.");
-        }
-        String jwtToken = jwtTokenProvider.resolveToken(bearerToken);
-        if(jwtToken != null && jwtTokenProvider.validateToken(jwtToken)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-        else {
-            throw new InvalidTokenException("토큰이 유효하지 않습니다.");
-        }
+        final String accessToken = getAccessTokenFromHttpServletRequest(request);
+        jwtTokenProvider.validateAccessToken(accessToken);
+        final Long userId = jwtTokenProvider.getSubject(accessToken);
+        setAuthentication(request, userId);
         filterChain.doFilter(request, response);
+    }
+    private String getAccessTokenFromHttpServletRequest(HttpServletRequest request) {
+        String accessToken = request.getHeader(AUTHORIZATION);
+        if (StringUtils.hasText(accessToken) && accessToken.startsWith(BEARER)) {
+            return accessToken.substring(BEARER.length());
+        }
+        throw new UnauthorizedException(ErrorCode.INVALID_ACCESS_TOKEN_VALUE);
+    }
+    private void setAuthentication(HttpServletRequest request, Long userId) {
+        MemberAuthentication authentication = new MemberAuthentication(userId, null, null);
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }
