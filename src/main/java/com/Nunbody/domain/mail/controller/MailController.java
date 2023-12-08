@@ -29,15 +29,15 @@ public class MailController {
     private final MailService mailService;
     private final MailManageService mailManageService;
     @GetMapping("/mails")
-    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long userId, @RequestParam String type) {
+    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long memberId, @RequestParam String type) {
         MailList mailList;
         String platform = type;
 
         if(platform.equals("naver")) {
-            mailList = mailService.getNaverMail(userId);
+            mailList = mailService.getNaverMail(memberId);
         }
         else {
-            mailList = mailService.getGoogleMail(userId);
+            mailList = mailService.getGoogleMail(memberId);
         }
         return SuccessResponse.ok(mailList);
     }
