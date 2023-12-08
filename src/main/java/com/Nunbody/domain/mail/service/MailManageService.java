@@ -34,8 +34,8 @@ public class MailManageService {
         Page<MailListResponseDto> mailListResponseDtoList = createMailListResponseDtoList(id,pageable);
         return mailListResponseDtoList;
     }
-    private Page<MailListResponseDto> createMailListResponseDtoList(Long id, Pageable pageable){
-        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberId(id, pageable);
+    private Page<MailListResponseDto> createMailListResponseDtoList(Long memberId, Pageable pageable){
+        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberId(memberId, pageable);
         return mailHeaderPage.map(mailHeader -> MailListResponseDto.of(mailHeader));
     }
     public String validateConnect(ValidateRequestDto validateRequestDto) throws MessagingException {
