@@ -7,7 +7,8 @@ import com.Nunbody.domain.member.dto.SignInResponseDto;
 import com.Nunbody.domain.member.repository.KeywordRepository;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.domain.member.dto.MemberRegisterRequestDto;
-import com.Nunbody.domain.member.repository.RefreshTokenRepository;
+//import com.Nunbody.domain.member.repository.RefreshTokenRepository;
+//import com.Nunbody.exception.auth.InvalidEdmailException;
 import com.Nunbody.exception.auth.InvalidEmailException;
 import com.Nunbody.exception.auth.InvalidPasswordException;
 import com.Nunbody.global.error.exception.BusinessException;
@@ -41,7 +42,7 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final OAuthService oAuthService;
-    private final RefreshTokenRepository refreshTokenRepository;
+//    private final RefreshTokenRepository refreshTokenRepository;
     public OAuthToken getOauthTokenWithCode(String socialLoginType, String code) throws JsonProcessingException {
         ResponseEntity<String> accessTokenResponse = null;
         if ("kakao".equals(socialLoginType)) {
@@ -117,14 +118,14 @@ public class MemberService {
             // 이 예외 클래스는 RuntimeException 또는 다른 적절한 예외 클래스를 상속하여 정의해야 합니다.
         }
     }
-    public void signOut(Long memberId) {
-        Member member = getMember(memberId);
-        deleteRefreshToken(member);
-    }
-    private void deleteRefreshToken(Member member) {
-        member.updateRefreshToken(null);
-        refreshTokenRepository.deleteById(member.getId());
-    }
+//    public void signOut(Long memberId) {
+//        Member member = getMember(memberId);
+//        deleteRefreshToken(member);
+//    }
+//    private void deleteRefreshToken(Member member) {
+//        member.updateRefreshToken(null);
+//        refreshTokenRepository.deleteById(member.getId());
+//    }
     private Member getMember(Long memberId){
         return memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException(MEMBER_NOT_FOUND));
     }
