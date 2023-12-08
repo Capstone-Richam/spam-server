@@ -1,6 +1,7 @@
 package com.Nunbody.domain.Mail.dto.response;
 
 import com.Nunbody.domain.Mail.domain.MailHeader;
+import com.Nunbody.domain.Mail.domain.PlatformType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ public class MailListResponseDto {
     private String title;
     private String fromPerson;
     private String date;
-    private String type;
+    private PlatformType type;
 
     public static MailListResponseDto of(MailHeader mailHeader){
         return MailListResponseDto.builder()
@@ -19,7 +20,7 @@ public class MailListResponseDto {
                 .title(mailHeader.getTitle())
                 .fromPerson(mailHeader.getFromPerson())
                 .date(mailHeader.getDate())
-                .type("GOOGLE")
+                .type(mailHeader.getPlatformType())
                 .build();
     }
 }
