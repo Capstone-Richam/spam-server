@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/member")
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -32,17 +32,12 @@ public class MemberController {
     }
 
     @PostMapping("/signin")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<SuccessResponse<?>> signIn(@RequestBody SignInRequestDto dto) {
         SignInResponseDto signInResponseDto= memberService.signIn(dto.getAccount(), dto.getPassword());
         return SuccessResponse.ok(signInResponseDto);
 
     }
 
-    @GetMapping("/code")
-    public OAuthToken getOauthTokenWithCode(@PathVariable String socialLoginType, @RequestParam String code) throws JsonProcessingException {
-        return memberService.getOauthTokenWithCode(socialLoginType,code);
-    }
     @PostMapping("/validate")
     public ResponseEntity<SuccessResponse<?>> validateMember(@RequestBody ValidateRequestDto validateRequestDto){
         if(validateRequestDto.getAorn().equals("account"))memberService.validateAccount(validateRequestDto.getContent());

@@ -3,26 +3,22 @@ package com.Nunbody.domain.Mail.service;
 
 import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.PlatformType;
-import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
+import com.Nunbody.domain.Mail.dto.response.MailResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 
 import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.global.error.exception.InvalidValueException;
-import com.Nunbody.global.error.exception.LoginException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.*;
-import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import static com.Nunbody.global.error.ErrorCode.*;
 
@@ -33,18 +29,18 @@ import static com.Nunbody.global.error.ErrorCode.*;
 public class MailManageService {
     private final MailRepository mailRepository;
     private final MemberRepository memberRepository;
-    public Page<MailListResponseDto> getMailList(Long memberId, String type, Pageable pageable){
-        Page<MailListResponseDto> mailListResponseDtoList = createMailListResponseDtoList(memberId,type,pageable);
+    public Page<MailResponseDto> getMailList(Long memberId, String type, Pageable pageable){
+        Page<MailResponseDto> mailListResponseDtoList = createMailListResponseDtoList(memberId,type,pageable);
         return mailListResponseDtoList;
     }
-    private Page<MailListResponseDto> createMailListResponseDtoList(Long memberId, String type,Pageable pageable){
+    private Page<MailResponseDto> createMailListResponseDtoList(Long memberId, String type, Pageable pageable){
         if(type.equals("ALL")){
             Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberId(memberId, pageable);
-            return mailHeaderPage.map(mailHeader -> MailListResponseDto.of(mailHeader));
+            return mailHeaderPage.map(mailHeader -> MailResponseDto.of(mailHeader));
 
         }
         Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdAndPlatformType(memberId, PlatformType.getEnumPlatformTypeFromStringPlatformType(type),pageable);
-        return mailHeaderPage.map(mailHeader -> MailListResponseDto.of(mailHeader));
+        return mailHeaderPage.map(mailHeader -> MailResponseDto.of(mailHeader));
     }
     public String validateConnect(ValidateRequestDto validateRequestDto) throws MessagingException {
         String validate = validateImap(validateRequestDto);

@@ -1,27 +1,23 @@
 package com.Nunbody.domain.Mail.controller;
 
-import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailList;
 import com.Nunbody.domain.Mail.domain.PlatformType;
-import com.Nunbody.domain.Mail.dto.response.MailBodyResponseDto;
-import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
+import com.Nunbody.domain.Mail.dto.response.MailDetailResponseDto;
+import com.Nunbody.domain.Mail.dto.response.MailResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
 import com.Nunbody.domain.Mail.service.MailManageService;
 import com.Nunbody.domain.Mail.service.MailService;
 import com.Nunbody.global.common.SuccessResponse;
-import java.util.Map;
+import com.Nunbody.global.config.auth.MemberId;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -43,8 +39,8 @@ public class MailController {
         return SuccessResponse.ok(mailList);
     }
     @GetMapping("/header")
-    public ResponseEntity<SuccessResponse<?>> getHeader(@RequestParam Long memberId, @RequestParam String type, @PageableDefault Pageable pageable){
-        final Page<MailListResponseDto> mailListResponseDtoList = mailManageService.getMailList(memberId,type, pageable);
+    public ResponseEntity<SuccessResponse<?>> getHeader(@MemberId Long memberId, @RequestParam String type, @PageableDefault Pageable pageable){
+        final Page<MailResponseDto> mailListResponseDtoList = mailManageService.getMailList(memberId,type, pageable);
         return SuccessResponse.ok(mailListResponseDtoList);
     }
     @PostMapping("/validate")
@@ -52,10 +48,9 @@ public class MailController {
         final String string= mailManageService.validateConnect(validateRequestDto);
         return SuccessResponse.ok(string);
     }
-    @GetMapping("/header/{id}")
+    @GetMapping("/detail/{id}")
     public ResponseEntity<SuccessResponse<?>> getMailBody(@PathVariable("id") Long mailId){
-        final MailBodyResponseDto mailBody = mailService.getMailBody(mailId);
-
+        final MailDetailResponseDto mailBody = mailService.getMailBody(mailId);
         return SuccessResponse.ok(mailBody);
     }
 }

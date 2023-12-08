@@ -5,6 +5,8 @@ import com.Nunbody.domain.member.dto.KeywordRequestDto;
 import com.Nunbody.domain.member.service.KeywordService;
 import com.Nunbody.global.common.SuccessResponse;
 import java.util.List;
+
+import com.Nunbody.global.config.auth.MemberId;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.springframework.data.mongodb.repository.Update;
@@ -24,19 +26,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/keyword")
 public class KeywordController {
     private final KeywordService keywordService;
-    @GetMapping("/{id}")
-    public ResponseEntity<SuccessResponse<?>> list(@PathVariable("id") Long memberId){
+    @GetMapping
+    public ResponseEntity<SuccessResponse<?>> list(@MemberId Long memberId){
         List<String> words = keywordService.getKeyword(memberId);
         return SuccessResponse.ok(words);
     }
     @PatchMapping("")
-    public ResponseEntity<SuccessResponse<?>> updateKeyword(@RequestBody KeywordRequestDto keywordRequestDto){
-        keywordService.addKeyword(keywordRequestDto);
+    public ResponseEntity<SuccessResponse<?>> updateKeyword(@MemberId Long memberId, @RequestBody KeywordRequestDto keywordRequestDto){
+        keywordService.addKeyword(memberId,keywordRequestDto);
         return SuccessResponse.ok(null);
     }
     @DeleteMapping("")
-    public ResponseEntity<SuccessResponse<?>> deleteKeyword(@RequestBody KeywordRequestDto keywordRequestDto){
-        keywordService.deleteKeyword(keywordRequestDto);
+    public ResponseEntity<SuccessResponse<?>> deleteKeyword(@MemberId Long memberId, @RequestBody KeywordRequestDto keywordRequestDto){
+        keywordService.deleteKeyword(memberId, keywordRequestDto);
         return SuccessResponse.ok(null);
     }
 }

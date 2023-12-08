@@ -3,12 +3,10 @@ package com.Nunbody.domain.Mail.service;
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.dto.response.FilterMailListResponseDto;
-import com.Nunbody.domain.Mail.dto.response.MailListResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.FilterKeywordRequest;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
-import edu.stanford.nlp.classify.ColumnDataClassifier;
-import edu.stanford.nlp.classify.Dataset;
+import com.Nunbody.global.config.auth.MemberId;
 import edu.stanford.nlp.ling.BasicDatum;
 import edu.stanford.nlp.ling.Datum;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,10 +35,10 @@ public class FilterService {
     private final MailRepository mailRepository;
     private final MailBodyRepository mailBodyRepository;
 
-    public Page<FilterMailListResponseDto> filterContent(FilterKeywordRequest filterKeywordRequest,Pageable pageable) {
+    public Page<FilterMailListResponseDto> filterContent( Long memberId,FilterKeywordRequest filterKeywordRequest, Pageable pageable) {
 
 
-        List<MailHeader> mailList = getMailHeaderList(filterKeywordRequest.getMemberId());
+        List<MailHeader> mailList = getMailHeaderList(memberId);
         Page<FilterMailListResponseDto> filterMailListResponseDtoList = createMailDtoPage(mailList,filterKeywordRequest, pageable );
 
         return filterMailListResponseDtoList;

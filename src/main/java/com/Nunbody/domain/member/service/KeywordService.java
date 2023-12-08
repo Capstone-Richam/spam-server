@@ -4,6 +4,8 @@ import com.Nunbody.domain.member.domain.Keyword;
 import com.Nunbody.domain.member.dto.KeywordRequestDto;
 import com.Nunbody.domain.member.repository.KeywordRepository;
 import java.util.List;
+
+import com.Nunbody.global.config.auth.MemberId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
@@ -12,18 +14,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KeywordService {
     private final KeywordRepository keywordRepository;
-    public void create(KeywordRequestDto keywordRequestDto) {
-        Keyword keyword = Keyword.builder()
-                .memberId(keywordRequestDto.getMemberId())
-                .words(keywordRequestDto.getWords())
-                .build();
 
-        keywordRepository.insert(keyword);
-
-    }
-
-    public void addKeyword(KeywordRequestDto keywordRequestDto) {
-        Keyword keyword = keywordRepository.findByMemberId(keywordRequestDto.getMemberId()).orElse(null);
+    public void addKeyword( Long memberId, KeywordRequestDto keywordRequestDto) {
+        Keyword keyword = keywordRepository.findByMemberId(memberId).orElse(null);
 
         if(keyword!=null) {
             keyword.getWords().addAll(keywordRequestDto.getWords());
@@ -31,8 +24,8 @@ public class KeywordService {
         }
     }
 
-    public void deleteKeyword(KeywordRequestDto keywordRequestDto) {
-        Keyword keyword = keywordRepository.findByMemberId(keywordRequestDto.getMemberId()).get();
+    public void deleteKeyword( Long memberId, KeywordRequestDto keywordRequestDto) {
+        Keyword keyword = keywordRepository.findByMemberId(memberId).get();
 
         if(keyword!=null){
             keyword.getWords().removeAll(keywordRequestDto.getWords());
