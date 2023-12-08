@@ -34,12 +34,11 @@ public class MailManageService {
     private final MailRepository mailRepository;
     private final MemberRepository memberRepository;
     public Page<MailListResponseDto> getMailList(Long memberId, String type, Pageable pageable){
-        Member member =getMember(memberId);
         Page<MailListResponseDto> mailListResponseDtoList = createMailListResponseDtoList(memberId,type,pageable);
         return mailListResponseDtoList;
     }
     private Page<MailListResponseDto> createMailListResponseDtoList(Long memberId, String type,Pageable pageable){
-        if(type.isEmpty()){
+        if(type.equals("ALL")){
             Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberId(memberId, pageable);
             return mailHeaderPage.map(mailHeader -> MailListResponseDto.of(mailHeader));
 
