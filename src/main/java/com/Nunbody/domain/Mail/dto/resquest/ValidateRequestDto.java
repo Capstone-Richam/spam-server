@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class ValidateRequestDto {
+    private String type;
     private String id;
     private String password;
 }
