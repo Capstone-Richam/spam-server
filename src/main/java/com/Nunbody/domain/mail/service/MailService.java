@@ -42,8 +42,6 @@ import java.util.Properties;
 @Transactional
 @Service
 public class MailService {
-
-
     private final MongoTemplate mongoTemplate;
     private final MailBodyRepository mailBodyRepository;
     private final MailRepository mailRepository;
@@ -92,6 +90,16 @@ public class MailService {
         return googleMail;
 
     }
+    /*public MailList getMail(Long memberId){
+        MailList naverMail = MailList.builder()
+                .memberId(memberId)
+                .build();
+
+        MailList googleMail = MailList.builder()
+                .memberId(memberId)
+                .build();
+
+    }*/
     public MailList mailSetting(Long userId, String platformHost, String platformId, String platformPassword, MailList mailList,
                                 PlatformType platformType){
         List<MailBody> mailBodies = new ArrayList<>();
@@ -119,7 +127,7 @@ public class MailService {
             MailHeader mailHeaderData;
 
 
-            for (int i = 200; i <210 ; i++) {
+            for (int i = 0; i <5 ; i++) {
                 matcher = pattern.matcher(messages[i].getFrom()[0].toString());
                 Instant receivedInstant = messages[i].getReceivedDate().toInstant();
                 ZonedDateTime kstDateTime = ZonedDateTime.ofInstant(receivedInstant, ZoneId.of("Asia/Seoul"));
@@ -148,7 +156,7 @@ public class MailService {
                 //mailList.addData(mailHeaderData);
 
                 Long mailId = mailHeaderData.getId();
-                mailBodies.add(extractMailBody(messages[i],mailId));
+                mailBodies.add(extractMailBody(platformHost,messages[i],mailId));
             }
             mongoTemplate.insertAll(mailBodies);
             // 폴더와 스토어 닫기
@@ -162,20 +170,29 @@ public class MailService {
 
         return mailList;
     }
-    public MailBody extractMailBody(Message messages, Long mailId) throws MessagingException, IOException {
+    public MailBody extractMailBody(String platformhost,Message messages, Long mailId) throws MessagingException, IOException {
 
         Object content = messages.getContent();
         byte[] contentBytes = null;
-
-        if (content instanceof Multipart) {
-            List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
-            // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
-            contentBytes = combineMultipartContent(multipartContentBytes);
-        } else
-            if(content instanceof Part){
-            contentBytes = parseBody(messages, (BodyPart) content);
+        if(platformhost.equals("imap.naver.com")) {
+            if (content instanceof Multipart) {
+                List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
+                // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
+                contentBytes = combineMultipartContent(multipartContentBytes);
+            } else if (content instanceof Part) {
+                contentBytes = parseBody(messages, (BodyPart) content);
+            }
         }
-
+        if(platformhost.equals("imap.google.com")) {
+//            if (content instanceof Multipart) {
+//                List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
+//                // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
+                contentBytes = null;
+//            } else
+                if (content instanceof Part) {
+                contentBytes = parseBody(messages, (BodyPart) content);
+            }
+        }
         MailBody mailBody = MailBody.builder()
                 .mailId(mailId)
                 .content(contentBytes != null ? new String(contentBytes, StandardCharsets.UTF_8) : " ")
