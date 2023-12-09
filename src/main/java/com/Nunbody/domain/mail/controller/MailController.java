@@ -30,7 +30,7 @@ public class MailController {
         MailList mailList;
         String platform = type;
 
-        if(platform.equals(PlatformType.NAVER)) {
+        if(platform.equals(PlatformType.NAVER.getStringPlatformType())) {
             mailList = mailService.getNaverMail(memberId);
         }
         else {

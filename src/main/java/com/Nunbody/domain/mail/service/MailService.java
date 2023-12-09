@@ -16,6 +16,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -118,12 +122,17 @@ public class MailService {
 
             for (int i = 80; i <90 ; i++) {
                 matcher = pattern.matcher(messages[i].getFrom()[0].toString());
+                Instant receivedInstant = messages[i].getReceivedDate().toInstant();
+                ZonedDateTime kstDateTime = ZonedDateTime.ofInstant(receivedInstant, ZoneId.of("Asia/Seoul"));
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = kstDateTime.format(formatter);
+
                 if (matcher.find()) {
                     String fromPerson = matcher.group(1);
                     mailHeaderData = MailHeader.builder()
                             .title(messages[i].getSubject())
                             .fromPerson(fromPerson)
-                            .date(String.valueOf(messages[i].getReceivedDate()))
+                            .date(formattedDate)
                             .member(memberRepository.findById(userId).get())
                             .platformType(platformType)
                             .build();
@@ -131,7 +140,7 @@ public class MailService {
                     mailHeaderData = MailHeader.builder()
                             .title(messages[i].getSubject())
                             .fromPerson(messages[i].getFrom()[0].toString())
-                            .date(String.valueOf(messages[i].getReceivedDate()))
+                            .date(formattedDate)
                             .member(memberRepository.findById(userId).get())
                             .platformType(platformType)
                             .build();
