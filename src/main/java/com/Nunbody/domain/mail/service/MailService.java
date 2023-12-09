@@ -52,7 +52,6 @@ public class MailService {
     private Matcher matcher;
 
 
-
     public MailList getNaverMail(Long memberId){
 
         MailList naverMail = MailList.builder()

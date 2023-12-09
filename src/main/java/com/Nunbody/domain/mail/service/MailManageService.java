@@ -51,16 +51,17 @@ public class MailManageService {
     }
     private String validateImap(ValidateRequestDto validateRequestDto) throws MessagingException {
         try {
+            String host = validateRequestDto.getType();
             String id = validateRequestDto.getId();
             String password = validateRequestDto.getPassword();
             Properties prop = new Properties();
-            prop.put("mail.imap.host", "imap.naver.com");
+            prop.put("mail.imap.host", host);
             prop.put("mail.imap.port", 993);
             prop.put("mail.imap.ssl.enable", "true");
             prop.put("mail.imap.ssl.protocols", "TLSv1.2");
             prop.put("mail.store.protocol", "imap");
             Store store = createStore(prop);
-            store.connect("imap.naver.com", id, password);
+            store.connect(host, id, password);
             return "성공";
         } catch (AuthenticationFailedException e) {
             String errorMessage = e.getMessage();
@@ -73,8 +74,13 @@ public class MailManageService {
                 // You can log the error message or perform any other necessary actions
                 throw new InvalidValueException(IMAP_ERROR);
             }
+            if (errorMessage.contains("Invalid credentials")){
+                throw new InvalidValueException(INVALID_EMAIL_ERROR);
+            }
+            if(errorMessage.contains("IMAP access")){
+                throw new InvalidValueException(IMAP_ERROR);
+            }
         }
-
         return null;
     }
     private Store createStore(Properties prop) throws NoSuchProviderException {
