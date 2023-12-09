@@ -38,6 +38,13 @@ public class MailController {
         }
         return SuccessResponse.ok(mailList);
     }
+    /*@GetMapping("/mails")
+    public ResponseEntity<SuccessResponse<?>> getMail(@MemberId Long memberId){
+        MailList mailList;
+        mailList = mailService.getMail(memberId);
+
+        return SuccessResponse.ok(memberId);
+    }*/
     @GetMapping("/header")
     public ResponseEntity<SuccessResponse<?>> getHeader(@MemberId Long memberId, @RequestParam String type, @PageableDefault Pageable pageable){
         final Page<MailResponseDto> mailListResponseDtoList = mailManageService.getMailList(memberId,type, pageable);
