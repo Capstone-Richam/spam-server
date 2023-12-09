@@ -26,7 +26,7 @@ public class MailController {
     private final MailService mailService;
     private final MailManageService mailManageService;
     @GetMapping("/mails")
-    public ResponseEntity<SuccessResponse<?>> getMail(@RequestParam Long memberId, @RequestParam String type) {
+    public ResponseEntity<SuccessResponse<?>> getMail(@MemberId Long memberId, @RequestParam String type) {
         MailList mailList;
         String platform = type;
 
