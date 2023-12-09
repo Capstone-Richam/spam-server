@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MailRepository extends JpaRepository<MailHeader,Long> {
-    Page<MailHeader> findAllByMemberIdOrderByDate(Long id, Pageable pageable);
-    List<MailHeader> findAllByMemberIdOrderByDate(Long id);
-    Page<MailHeader> findAllByMemberIdAndPlatformTypeOrderByDate(Long memberId, PlatformType platformType, Pageable pageable);
+    Page<MailHeader> findAllByMemberIdOrderByDateDesc(Long id, Pageable pageable);
+    List<MailHeader> findAllByMemberIdOrderByDateDesc(Long id);
+    Page<MailHeader> findAllByMemberIdAndPlatformTypeOrderByDateDesc(Long memberId, PlatformType platformType, Pageable pageable);
 }
