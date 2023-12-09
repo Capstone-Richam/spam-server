@@ -120,7 +120,7 @@ public class MailService {
             MailHeader mailHeaderData;
 
 
-            for (int i = 80; i <90 ; i++) {
+            for (int i = 200; i <210 ; i++) {
                 matcher = pattern.matcher(messages[i].getFrom()[0].toString());
                 Instant receivedInstant = messages[i].getReceivedDate().toInstant();
                 ZonedDateTime kstDateTime = ZonedDateTime.ofInstant(receivedInstant, ZoneId.of("Asia/Seoul"));

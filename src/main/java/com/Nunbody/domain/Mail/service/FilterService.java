@@ -230,7 +230,7 @@ public class FilterService {
         return new BasicDatum<>(Collections.singleton(label), feature);
     }
     private List<MailHeader> getMailHeaderList(Long memberId){
-        return mailRepository.findAllByMemberIdOrderByDate(memberId);
+        return mailRepository.findAllByMemberIdOrderByDateDesc(memberId);
     }
     private MailBody getMailBody(Long mailId){
         return mailBodyRepository.findByMailId(mailId);
