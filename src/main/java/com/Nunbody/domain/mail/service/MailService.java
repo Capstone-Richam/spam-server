@@ -30,7 +30,6 @@ import javax.mail.internet.MimeMultipart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,40 +124,47 @@ public class MailService {
 
             Message[] messages = folder.getMessages();
             MailHeader mailHeaderData;
+            MailHeader latestMail = mailRepository.findFirstByMemberIdAndPlatformTypeOrderByDateDesc(userId,platformType).orElse(null);
 
-
-            for (int i = 0; i <5 ; i++) {
-                matcher = pattern.matcher(messages[i].getFrom()[0].toString());
-                Instant receivedInstant = messages[i].getReceivedDate().toInstant();
-                ZonedDateTime kstDateTime = ZonedDateTime.ofInstant(receivedInstant, ZoneId.of("Asia/Seoul"));
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String formattedDate = kstDateTime.format(formatter);
-
-                if (matcher.find()) {
-                    String fromPerson = matcher.group(1);
-                    mailHeaderData = MailHeader.builder()
-                            .title(messages[i].getSubject())
-                            .fromPerson(fromPerson)
-                            .date(formattedDate)
-                            .member(memberRepository.findById(userId).get())
-                            .platformType(platformType)
-                            .build();
-                } else {
-                    mailHeaderData = MailHeader.builder()
-                            .title(messages[i].getSubject())
-                            .fromPerson(messages[i].getFrom()[0].toString())
-                            .date(formattedDate)
-                            .member(memberRepository.findById(userId).get())
-                            .platformType(platformType)
-                            .build();
-                }
-                mailRepository.save(mailHeaderData);
-                //mailList.addData(mailHeaderData);
-
-                Long mailId = mailHeaderData.getId();
-                mailBodies.add(extractMailBody(platformHost,messages[i],mailId));
+            if (latestMail==null){
+                reset(messages,userId, platformType,platformHost);
             }
-            mongoTemplate.insertAll(mailBodies);
+            else {
+                for (int i = messages.length - 2; i < messages.length; i++) {
+                    matcher = pattern.matcher(messages[i].getFrom()[0].toString());
+                    Instant receivedInstant = messages[i].getReceivedDate().toInstant();
+                    ZonedDateTime kstDateTime = ZonedDateTime.ofInstant(receivedInstant, ZoneId.of("Asia/Seoul"));
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String formattedDate = kstDateTime.format(formatter);
+                    int compare = formattedDate.compareTo(latestMail.getDate());
+                    if (compare > 0) {
+                        if (matcher.find()) {
+                            String fromPerson = matcher.group(1);
+                            mailHeaderData = MailHeader.builder()
+                                    .title(messages[i].getSubject())
+                                    .fromPerson(fromPerson)
+                                    .date(formattedDate)
+                                    .member(memberRepository.findById(userId).get())
+                                    .platformType(platformType)
+                                    .build();
+                        } else {
+                            mailHeaderData = MailHeader.builder()
+                                    .title(messages[i].getSubject())
+                                    .fromPerson(messages[i].getFrom()[0].toString())
+                                    .date(formattedDate)
+                                    .member(memberRepository.findById(userId).get())
+                                    .platformType(platformType)
+                                    .build();
+                        }
+                        mailRepository.save(mailHeaderData);
+                        //mailList.addData(mailHeaderData);
+
+                        Long mailId = mailHeaderData.getId();
+                        mailBodies.add(extractMailBody(platformHost, messages[i], mailId));
+                    }
+                    mongoTemplate.insertAll(mailBodies);
+                }
+            }
             // 폴더와 스토어 닫기
             folder.close(false);
             store.close();
@@ -170,6 +176,43 @@ public class MailService {
 
         return mailList;
     }
+    public void reset(Message[] messages, Long userId, PlatformType platformType, String platformHost)
+            throws MessagingException, IOException {
+        MailHeader mailHeaderData;
+        List<MailBody> mailBodies = new ArrayList<>();
+        for (int i = messages.length-20; i < messages.length; i++) {
+            matcher = pattern.matcher(messages[i].getFrom()[0].toString());
+            Instant receivedInstant = messages[i].getReceivedDate().toInstant();
+            ZonedDateTime kstDateTime = ZonedDateTime.ofInstant(receivedInstant, ZoneId.of("Asia/Seoul"));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDate = kstDateTime.format(formatter);
+            if (matcher.find()) {
+                String fromPerson = matcher.group(1);
+                mailHeaderData = MailHeader.builder()
+                        .title(messages[i].getSubject())
+                        .fromPerson(fromPerson)
+                        .date(formattedDate)
+                        .member(memberRepository.findById(userId).get())
+                        .platformType(platformType)
+                        .build();
+            } else {
+                mailHeaderData = MailHeader.builder()
+                        .title(messages[i].getSubject())
+                        .fromPerson(messages[i].getFrom()[0].toString())
+                        .date(formattedDate)
+                        .member(memberRepository.findById(userId).get())
+                        .platformType(platformType)
+                        .build();
+            }
+            mailRepository.save(mailHeaderData);
+            //mailList.addData(mailHeaderData);
+
+            Long mailId = mailHeaderData.getId();
+            mailBodies.add(extractMailBody(platformHost, messages[i], mailId));
+        }
+        mongoTemplate.insertAll(mailBodies);
+    }
+
     public MailBody extractMailBody(String platformhost,Message messages, Long mailId) throws MessagingException, IOException {
 
         Object content = messages.getContent();

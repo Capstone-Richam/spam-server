@@ -35,7 +35,7 @@ public class FilterService {
     private final MailRepository mailRepository;
     private final MailBodyRepository mailBodyRepository;
 
-    public Page<FilterMailListResponseDto> filterContent( Long memberId,FilterKeywordRequest filterKeywordRequest, Pageable pageable) {
+    public Page<FilterMailListResponseDto> filterContent(Long memberId, FilterKeywordRequest filterKeywordRequest, Pageable pageable) {
 
 
         List<MailHeader> mailList = getMailHeaderList(memberId);
