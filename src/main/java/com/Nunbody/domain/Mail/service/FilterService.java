@@ -114,9 +114,8 @@ public class FilterService {
     }
     private Page<FilterMailListResponseDto> createMailDtoPage(List<MailHeader> mailList, FilterKeywordRequest filterKeywordRequest,Pageable pageable){
         List<MailHeader> filteredMailList = new ArrayList<>();
-        if (filterKeywordRequest.getKeywords().stream().anyMatch("업무협력"::contains)){
-            filterKeywordRequest.getKeywords().add("slack");
-        }
+        likeLeaning(filterKeywordRequest);
+
         for (MailHeader mailHeader : mailList) {
 
             MailBody mailContent = getMailBody(mailHeader.getId());
@@ -161,6 +160,13 @@ public class FilterService {
         List<FilterMailListResponseDto> filterMailListResponseDtoList=createFilterMailListResponseDtoList(filteredMailList);
         Page<FilterMailListResponseDto> resultPage = new PageImpl<>(filterMailListResponseDtoList, pageable,filterMailListResponseDtoList.size());
         return resultPage;
+    }
+    private void likeLeaning(FilterKeywordRequest filterKeywordRequest){
+        if (filterKeywordRequest.getKeywords().stream().anyMatch("업무협력"::contains)){
+            filterKeywordRequest.getKeywords().add("slack");
+            filterKeywordRequest.getKeywords().add("EC2");
+            filterKeywordRequest.getKeywords().add("github");
+        }
     }
     private boolean isContainInHeader(List<MailHeader> filteredMailList,MailHeader mailHeader, List<String> keywords) {
         if (mailHeader.getTitle() == null) {
