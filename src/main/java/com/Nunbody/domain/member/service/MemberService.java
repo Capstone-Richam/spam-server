@@ -88,10 +88,11 @@ public class MemberService {
 
         @Transactional
         public SignInResponseDto signIn (String account, String password){
-            Member member = memberRepository.findByAccount(account).orElseThrow(() -> new InvalidEmailException("회원정보가 존재하지 않습니다."));
+            Member member = memberRepository.findByAccount(account).orElseThrow(() -> new BusinessException
+                    (NAME_ERROR));
             if (!passwordEncoder.matches(password, member.getPassword())) {
 
-                throw new InvalidPasswordException("잘못된 비밀번호입니다.");
+                throw new BusinessException(NAME_ERROR);
             }
             TokenInfo tokenInfo = oAuthService.issueAccessTokenAndRefreshToken(member);
             member.updateRefreshToken(tokenInfo.getRefreshToken());
