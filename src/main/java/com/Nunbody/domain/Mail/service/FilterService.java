@@ -26,10 +26,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -148,10 +145,11 @@ public class FilterService {
                 }
             }
 
-            if (containsAnyKeyword) {
-
-                mailHeader.updateTopKeyword(topKeyword);
-
+            boolean isContainInHeader = isContainInHeader(mailHeader,filterKeywordRequest.getKeywords());
+            if (containsAnyKeyword||isContainInHeader) {
+                if(mailHeader.getTopKeyword().isEmpty()) {
+                    mailHeader.updateTopKeyword(topKeyword);
+                }
                 filteredMailList.add(mailHeader);
             }
         }
@@ -160,6 +158,19 @@ public class FilterService {
         Page<FilterMailListResponseDto> resultPage = new PageImpl<>(filterMailListResponseDtoList, pageable,filterMailListResponseDtoList.size());
         return resultPage;
     }
+    private boolean isContainInHeader(MailHeader mailHeader, List<String> keywords) {
+        Optional<String> matchedKeyword = keywords.stream()
+                .filter(keyword -> mailHeader.getTitle().toLowerCase().contains(keyword))
+                .findFirst();
+
+        if (matchedKeyword.isPresent()) {
+            mailHeader.updateTopKeyword(matchedKeyword.get());
+            return true;
+        }
+
+        return false;
+    }
+
     private List<FilterMailListResponseDto> createFilterMailListResponseDtoList(List<MailHeader> filteredMailList){
         return filteredMailList.stream().map(mailHeader -> FilterMailListResponseDto.of(mailHeader, mailHeader.getTopKeyword()))
                 .collect(Collectors.toList());
