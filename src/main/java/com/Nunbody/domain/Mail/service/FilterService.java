@@ -114,8 +114,11 @@ public class FilterService {
     }
     private Page<FilterMailListResponseDto> createMailDtoPage(List<MailHeader> mailList, FilterKeywordRequest filterKeywordRequest,Pageable pageable){
         List<MailHeader> filteredMailList = new ArrayList<>();
-
+        if (filterKeywordRequest.getKeywords().stream().anyMatch("업무협력"::contains)){
+            filterKeywordRequest.getKeywords().add("slack");
+        }
         for (MailHeader mailHeader : mailList) {
+
             MailBody mailContent = getMailBody(mailHeader.getId());
 
             if (mailContent == null || mailContent.getContent() == null) {
@@ -145,11 +148,12 @@ public class FilterService {
                 }
             }
 
-            boolean isContainInHeader = isContainInHeader(mailHeader,filterKeywordRequest.getKeywords());
+            boolean isContainInHeader=isContainInHeader(filteredMailList,mailHeader,filterKeywordRequest.getKeywords());
             if (containsAnyKeyword||isContainInHeader) {
-                if(mailHeader.getTopKeyword().isEmpty()) {
+                if (!isContainInHeader) {
                     mailHeader.updateTopKeyword(topKeyword);
                 }
+
                 filteredMailList.add(mailHeader);
             }
         }
@@ -158,18 +162,27 @@ public class FilterService {
         Page<FilterMailListResponseDto> resultPage = new PageImpl<>(filterMailListResponseDtoList, pageable,filterMailListResponseDtoList.size());
         return resultPage;
     }
-    private boolean isContainInHeader(MailHeader mailHeader, List<String> keywords) {
-        Optional<String> matchedKeyword = keywords.stream()
-                .filter(keyword -> mailHeader.getTitle().toLowerCase().contains(keyword))
-                .findFirst();
+    private boolean isContainInHeader(List<MailHeader> filteredMailList,MailHeader mailHeader, List<String> keywords) {
+        if (mailHeader.getTitle() == null) {
+            mailHeader.updateTitle("");
+            return false;
+        } else {
 
-        if (matchedKeyword.isPresent()) {
-            mailHeader.updateTopKeyword(matchedKeyword.get());
+            Optional<String> matchedKeyword = keywords.stream()
+                    .filter(keyword -> mailHeader.getTitle().toLowerCase().contains(keyword))
+                    .findFirst();
+
+            if (matchedKeyword.isPresent()) {
+                mailHeader.updateTopKeyword(matchedKeyword  .get());
+
             return true;
-        }
+            }
 
         return false;
+        }
     }
+
+
 
     private List<FilterMailListResponseDto> createFilterMailListResponseDtoList(List<MailHeader> filteredMailList){
         return filteredMailList.stream().map(mailHeader -> FilterMailListResponseDto.of(mailHeader, mailHeader.getTopKeyword()))
