@@ -180,7 +180,7 @@ public class MailService {
             throws MessagingException, IOException {
         MailHeader mailHeaderData;
         List<MailBody> mailBodies = new ArrayList<>();
-        for (int i = messages.length-20; i < messages.length; i++) {
+        for (int i = messages.length-30; i < messages.length; i++) {
             matcher = pattern.matcher(messages[i].getFrom()[0].toString());
             Instant receivedInstant = messages[i].getReceivedDate().toInstant();
             ZonedDateTime kstDateTime = ZonedDateTime.ofInstant(receivedInstant, ZoneId.of("Asia/Seoul"));
@@ -226,12 +226,12 @@ public class MailService {
                 contentBytes = parseBody(messages, (BodyPart) content);
             }
         }
-        if(platformhost.equals("imap.google.com")) {
-//            if (content instanceof Multipart) {
-//                List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
-//                // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
+        if(platformhost.equals("imap.gmail.com")) {
+            if (content instanceof Multipart) {
+                //List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
+                // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
                 contentBytes = null;
-//            } else
+            } else
                 if (content instanceof Part) {
                 contentBytes = parseBody(messages, (BodyPart) content);
             }
