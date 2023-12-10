@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 
+import static com.Nunbody.domain.Mail.domain.PlatformType.NAVER;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/mail")
@@ -28,9 +30,8 @@ public class MailController {
     @GetMapping("/mails")
     public ResponseEntity<SuccessResponse<?>> getMail(@MemberId Long memberId, @RequestParam String type) {
         MailList mailList;
-        String platform = type;
 
-        if(platform.equals(PlatformType.NAVER.getStringPlatformType())) {
+        if(PlatformType.getEnumPlatformTypeFromStringPlatformType(type).equals(NAVER)) {
             mailList = mailService.getNaverMail(memberId);
         }
         else {

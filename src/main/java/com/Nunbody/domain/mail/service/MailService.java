@@ -55,8 +55,9 @@ public class MailService {
                 .memberId(memberId)
                 .build();
 
-        String id = memberRepository.findNaverIdById(memberId).orElse(null);
-        String decode  = EncoderDecoder.decodeFromBase64(memberRepository.findNaverPasswordById(memberId).get());
+        Member member = memberRepository.findById(memberId).orElse(null);
+        String id = member.getNaverId();
+        String decode  = EncoderDecoder.decodeFromBase64(member.getNaverPassword());
 
         /** naver mail */
         final String naverHost = "imap.naver.com";

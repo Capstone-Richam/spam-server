@@ -7,9 +7,12 @@ import com.Nunbody.domain.member.dto.SignInResponseDto;
 import com.Nunbody.domain.member.repository.KeywordRepository;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.domain.member.dto.MemberRegisterRequestDto;
+//import com.Nunbody.domain.member.repository.RefreshTokenRepository;
+//import com.Nunbody.exception.auth.InvalidEdmailException;
 import com.Nunbody.exception.auth.InvalidEmailException;
 import com.Nunbody.exception.auth.InvalidPasswordException;
 import com.Nunbody.global.error.exception.BusinessException;
+import com.Nunbody.global.error.exception.EntityNotFoundException;
 import com.Nunbody.global.error.exception.InvalidValueException;
 import com.Nunbody.jwt.JwtTokenProvider;
 import com.Nunbody.token.OAuthToken;
@@ -27,8 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.Nunbody.global.error.ErrorCode.ACCOUNT_EXISTS_ERROR;
-import static com.Nunbody.global.error.ErrorCode.NAME_EXISTS_ERROR;
+import static com.Nunbody.global.error.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -40,7 +42,7 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final OAuthService oAuthService;
-
+//    private final RefreshTokenRepository refreshTokenRepository;
     public OAuthToken getOauthTokenWithCode(String socialLoginType, String code) throws JsonProcessingException {
         ResponseEntity<String> accessTokenResponse = null;
         if ("kakao".equals(socialLoginType)) {
@@ -115,5 +117,16 @@ public class MemberService {
             // DuplicateAccountException은 중복 계정이 발견되었을 때 던질 예외 클래스입니다.
             // 이 예외 클래스는 RuntimeException 또는 다른 적절한 예외 클래스를 상속하여 정의해야 합니다.
         }
+    }
+//    public void signOut(Long memberId) {
+//        Member member = getMember(memberId);
+//        deleteRefreshToken(member);
+//    }
+//    private void deleteRefreshToken(Member member) {
+//        member.updateRefreshToken(null);
+//        refreshTokenRepository.deleteById(member.getId());
+//    }
+    private Member getMember(Long memberId){
+        return memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException(MEMBER_NOT_FOUND));
     }
     }
