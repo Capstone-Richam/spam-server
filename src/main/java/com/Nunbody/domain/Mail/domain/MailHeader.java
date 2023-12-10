@@ -35,4 +35,7 @@ public class MailHeader {
     public void updateTopKeyword(String keyword) {
         this.topKeyword = keyword;
     }
+    public void updateTitle(String title) {
+        this.title = title;
+    }
 }
