@@ -7,8 +7,12 @@ import com.Nunbody.domain.Mail.dto.resquest.FilterKeywordRequest;
 import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.Nunbody.global.config.auth.MemberId;
+import edu.stanford.nlp.classify.Classifier;
+import edu.stanford.nlp.classify.ColumnDataClassifier;
+import edu.stanford.nlp.classify.Dataset;
 import edu.stanford.nlp.ling.BasicDatum;
 import edu.stanford.nlp.ling.Datum;
+import edu.stanford.nlp.stats.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -22,9 +26,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,8 +45,8 @@ public class FilterService {
 
         return filterMailListResponseDtoList;
     }
-   /* public List<String> categoryFilter(FilterKeywordRequest filterKeywordRequest)throws IOException {
-        List<MailHeader> mailList = getMailHeaderList(filterKeywordRequest.getMemberId());
+   public List<String> categoryFilter(Long memberId,FilterKeywordRequest filterKeywordRequest)throws IOException {
+        List<MailHeader> mailList = getMailHeaderList(memberId);
 
         List<MailHeader> filteredMailList = new ArrayList<>();
         List<String> list = new ArrayList<>();
@@ -59,24 +61,29 @@ public class FilterService {
             Dataset<String, String> dataset = new Dataset<>();
             dataset.add(makeDatum("쇼핑", "프리쇼핑"));
             dataset.add(makeDatum("결제", "결제안내"));
-
+            Datum<String,String> example=makeDatum("쇼핑", "프리쇼핑");
             // Dataset을 CSV 파일로 저장
             saveDatasetToFile(dataset, filePath);
-            String outputSVMlightFilePath="src/main/resources/data2";
+//            String outputSVMlightFilePath="src/main/resources/data2";
 //            convertCSVtoSVMlight(filePath, outputSVMlightFilePath);
 
             // 텍스트 분류 모델 학습
-            ColumnDataClassifier classifier = new ColumnDataClassifier("src/main/resources/prop.txt"); // 프로퍼티 파일을 정의하여 사용
-            classifier.trainClassifier(outputSVMlightFilePath);
-
-            // HTML에서 텍스트 추출
-            Datum<String, String> extractedText = extractTextFromHtml(htmlContent);
+//            ColumnDataClassifier classifier = new ColumnDataClassifier("src/main/resources/prop.txt"); // 프로퍼티 파일을 정의하여 사용
+//            classifier.trainClassifier(outputSVMlightFilePath);
+//
+//            // HTML에서 텍스트 추출
+//            Datum<String, String> extractedText = extractTextFromHtml(htmlContent);
 
             // 추출한 텍스트를 통해 카테고리 예측
-            String predictedCategory = classifier.classOf(extractedText);
+//            Classifier<String,String> classifier1 = new Classifier<String, String>() ;
+            String predictedCategory = classOf(example);
             list.add(predictedCategory);
         }
         return list;
+    }
+    public String classOf(Datum<String,String> example) {
+        ColumnDataClassifier classifier = new ColumnDataClassifier("src/main/resources/prop.txt");
+        return classifier.classOf(example);
     }
     private static void saveDatasetToFile(Dataset<String, String> dataset, String filePath) {
         try (FileWriter writer = new FileWriter(filePath)) {
@@ -104,7 +111,7 @@ public class FilterService {
 
         return makeDatum("SomeLabel",extractedText);
         // 생성한 Datum 반환
-    }*/
+    }
     private Page<FilterMailListResponseDto> createMailDtoPage(List<MailHeader> mailList, FilterKeywordRequest filterKeywordRequest,Pageable pageable){
         List<MailHeader> filteredMailList = new ArrayList<>();
 
@@ -138,10 +145,11 @@ public class FilterService {
                 }
             }
 
-            if (containsAnyKeyword) {
-
-                mailHeader.updateTopKeyword(topKeyword);
-
+            boolean isContainInHeader = isContainInHeader(mailHeader,filterKeywordRequest.getKeywords());
+            if (containsAnyKeyword||isContainInHeader) {
+                if(mailHeader.getTopKeyword().isEmpty()) {
+                    mailHeader.updateTopKeyword(topKeyword);
+                }
                 filteredMailList.add(mailHeader);
             }
         }
@@ -150,6 +158,19 @@ public class FilterService {
         Page<FilterMailListResponseDto> resultPage = new PageImpl<>(filterMailListResponseDtoList, pageable,filterMailListResponseDtoList.size());
         return resultPage;
     }
+    private boolean isContainInHeader(MailHeader mailHeader, List<String> keywords) {
+        Optional<String> matchedKeyword = keywords.stream()
+                .filter(keyword -> mailHeader.getTitle().toLowerCase().contains(keyword))
+                .findFirst();
+
+        if (matchedKeyword.isPresent()) {
+            mailHeader.updateTopKeyword(matchedKeyword.get());
+            return true;
+        }
+
+        return false;
+    }
+
     private List<FilterMailListResponseDto> createFilterMailListResponseDtoList(List<MailHeader> filteredMailList){
         return filteredMailList.stream().map(mailHeader -> FilterMailListResponseDto.of(mailHeader, mailHeader.getTopKeyword()))
                 .collect(Collectors.toList());
