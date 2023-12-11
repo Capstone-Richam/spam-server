@@ -12,6 +12,14 @@ import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.global.common.EncoderDecoder;
 import com.sun.mail.util.BASE64DecoderStream;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.mail.*;
+import javax.mail.internet.MimeMultipart;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,19 +30,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.mail.internet.MimeMultipart;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.mail.*;
-import java.util.Properties;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,7 +47,7 @@ public class MailService {
     private Matcher matcher;
 
 
-    public MailList getNaverMail(Long memberId){
+    public MailList getNaverMail(Long memberId) {
 
         MailList naverMail = MailList.builder()
                 .memberId(memberId)
@@ -57,7 +55,7 @@ public class MailService {
 
         Member member = memberRepository.findById(memberId).orElse(null);
         String id = member.getNaverId();
-        String decode  = EncoderDecoder.decodeFromBase64(member.getNaverPassword());
+        String decode = EncoderDecoder.decodeFromBase64(member.getNaverPassword());
 
         /** naver mail */
         final String naverHost = "imap.naver.com";
@@ -66,18 +64,19 @@ public class MailService {
 
         final String naverPassword = decode;
 
-        naverMail = mailSetting(memberId,naverHost,naverId,naverPassword,naverMail,PlatformType.NAVER);
+        naverMail = mailSetting(memberId, naverHost, naverId, naverPassword, naverMail, PlatformType.NAVER);
         return naverMail;
 
     }
-    public MailList getGoogleMail(Long memberId){
+
+    public MailList getGoogleMail(Long memberId) {
 
         MailList googleMail = MailList.builder()
                 .memberId(memberId)
                 .build();
         Member member = memberRepository.findById(memberId).orElse(null);
         String id = member.getGmailId();
-        String decode  = EncoderDecoder.decodeFromBase64(member.getGmailPassword());
+        String decode = EncoderDecoder.decodeFromBase64(member.getGmailPassword());
 
         /** google mail */
         final String googleHost = "imap.gmail.com";
@@ -86,22 +85,13 @@ public class MailService {
 
         final String googlePassword = decode;
 
-        googleMail = mailSetting(memberId, googleHost, googleId, googlePassword ,googleMail, PlatformType.GOOGLE);
+        googleMail = mailSetting(memberId, googleHost, googleId, googlePassword, googleMail, PlatformType.GOOGLE);
         return googleMail;
 
     }
-    /*public MailList getMail(Long memberId){
-        MailList naverMail = MailList.builder()
-                .memberId(memberId)
-                .build();
 
-        MailList googleMail = MailList.builder()
-                .memberId(memberId)
-                .build();
-
-    }*/
     public MailList mailSetting(Long userId, String platformHost, String platformId, String platformPassword, MailList mailList,
-                                PlatformType platformType){
+                                PlatformType platformType) {
         List<MailBody> mailBodies = new ArrayList<>();
 
         try {
@@ -117,7 +107,7 @@ public class MailService {
 
             // Store 클래스
             Store store = session.getStore("imap");
-            store.connect(platformHost,platformId,platformPassword);
+            store.connect(platformHost, platformId, platformPassword);
 
             // 받은 편지함
             Folder folder = store.getFolder("inbox");
@@ -125,12 +115,11 @@ public class MailService {
 
             Message[] messages = folder.getMessages();
             MailHeader mailHeaderData;
-            MailHeader latestMail = mailRepository.findFirstByMemberIdAndPlatformTypeOrderByDateDesc(userId,platformType).orElse(null);
+            MailHeader latestMail = mailRepository.findFirstByMemberIdAndPlatformTypeOrderByDateDesc(userId, platformType).orElse(null);
 
-            if (latestMail==null){
-                reset(messages,userId, platformType,platformHost);
-            }
-            else {
+            if (latestMail == null) {
+                reset(messages, userId, platformType, platformHost);
+            } else {
                 for (int i = messages.length - 2; i < messages.length; i++) {
                     matcher = pattern.matcher(messages[i].getFrom()[0].toString());
                     Instant receivedInstant = messages[i].getReceivedDate().toInstant();
@@ -177,11 +166,12 @@ public class MailService {
 
         return mailList;
     }
+
     public void reset(Message[] messages, Long userId, PlatformType platformType, String platformHost)
             throws MessagingException, IOException {
         MailHeader mailHeaderData;
         List<MailBody> mailBodies = new ArrayList<>();
-        for (int i = messages.length-20; i < messages.length; i++) {
+        for (int i = 0; i < messages.length; i++) {
             matcher = pattern.matcher(messages[i].getFrom()[0].toString());
             Instant receivedInstant = messages[i].getReceivedDate().toInstant();
             ZonedDateTime kstDateTime = ZonedDateTime.ofInstant(receivedInstant, ZoneId.of("Asia/Seoul"));
@@ -206,7 +196,7 @@ public class MailService {
                         .build();
             }
             mailRepository.save(mailHeaderData);
-            //mailList.addData(mailHeaderData);
+
 
             Long mailId = mailHeaderData.getId();
             mailBodies.add(extractMailBody(platformHost, messages[i], mailId));
@@ -214,11 +204,11 @@ public class MailService {
         mongoTemplate.insertAll(mailBodies);
     }
 
-    public MailBody extractMailBody(String platformhost,Message messages, Long mailId) throws MessagingException, IOException {
+    public MailBody extractMailBody(String platformhost, Message messages, Long mailId) throws MessagingException, IOException {
 
         Object content = messages.getContent();
         byte[] contentBytes = null;
-        if(platformhost.equals("imap.naver.com")) {
+        if (platformhost.equals("imap.naver.com")) {
             if (content instanceof Multipart) {
                 List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
                 // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
@@ -227,13 +217,12 @@ public class MailService {
                 contentBytes = parseBody(messages, (BodyPart) content);
             }
         }
-        if(platformhost.equals("imap.google.com")) {
-//            if (content instanceof Multipart) {
-//                List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
-//                // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
+        if (platformhost.equals("imap.google.com")) {
+            if (content instanceof Multipart) {
+                List<byte[]> multipartContentBytes = parseMultipart(messages, (Multipart) content);
+                // 여러 BodyPart의 결과를 합쳐서 contentBytes로 설정
                 contentBytes = null;
-//            } else
-                if (content instanceof Part) {
+            } else if (content instanceof Part) {
                 contentBytes = parseBody(messages, (BodyPart) content);
             }
         }
@@ -244,6 +233,7 @@ public class MailService {
 
         return mailBody;
     }
+
     private static List<byte[]> parseMultipart(Message message, Multipart mp) throws IOException, MessagingException {
         MimeMultipart mm = (MimeMultipart) mp;
 
@@ -254,12 +244,13 @@ public class MailService {
             BodyPart bodyPart = mm.getBodyPart(i);
             Object partContent = bodyPart.getContent();
 
-            byte[] partContentBytes = parseBody(message,bodyPart);
+            byte[] partContentBytes = parseBody(message, bodyPart);
             multipartContentBytes.add(partContentBytes);
         }
 
         return multipartContentBytes;
     }
+
     private static byte[] combineMultipartContent(List<byte[]> multipartContentBytes) {
         // 여러 BodyPart의 결과를 합치는 로직을 구현
         // 예를 들어, 각 부분을 줄바꿈으로 구분하여 이어붙일 수 있습니다.
@@ -274,6 +265,7 @@ public class MailService {
         // 최종 결과를 byte 배열로 변환
         return combinedContent.toString().getBytes(StandardCharsets.UTF_8);
     }
+
     private static byte[] parseBody(Message message, BodyPart bp) throws IOException, MessagingException {
         Object obj = bp.getContent();
         byte[] contentBytes = null;
@@ -317,11 +309,13 @@ public class MailService {
         MailResponseDto mailResponseDto = createMailDetailResponseDto(mailId);
         return MailDetailResponseDto.of(mailResponseDto, mailBody.getContent());
     }
-    private MailResponseDto createMailDetailResponseDto(Long mailId){
+
+    private MailResponseDto createMailDetailResponseDto(Long mailId) {
         MailHeader mailHeader = getMailHeader(mailId);
         return MailResponseDto.of(mailHeader);
     }
-    private MailHeader getMailHeader(Long mailId){
+
+    private MailHeader getMailHeader(Long mailId) {
         return mailRepository.findById(mailId).orElse(null);
     }
 }

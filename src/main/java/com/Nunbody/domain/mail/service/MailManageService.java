@@ -6,7 +6,6 @@ import com.Nunbody.domain.Mail.domain.PlatformType;
 import com.Nunbody.domain.Mail.dto.response.MailResponseDto;
 import com.Nunbody.domain.Mail.dto.resquest.ValidateRequestDto;
 import com.Nunbody.domain.Mail.repository.MailRepository;
-
 import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.global.error.exception.InvalidValueException;
@@ -20,7 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.*;
 import java.util.Properties;
 
-import static com.Nunbody.global.error.ErrorCode.*;
+import static com.Nunbody.global.error.ErrorCode.IMAP_ERROR;
+import static com.Nunbody.global.error.ErrorCode.INVALID_EMAIL_ERROR;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,26 +29,31 @@ import static com.Nunbody.global.error.ErrorCode.*;
 public class MailManageService {
     private final MailRepository mailRepository;
     private final MemberRepository memberRepository;
-    public Page<MailResponseDto> getMailList(Long memberId, String type, Pageable pageable){
-        Page<MailResponseDto> mailListResponseDtoList = createMailListResponseDtoList(memberId,type,pageable);
+
+    public Page<MailResponseDto> getMailList(Long memberId, String type, Pageable pageable) {
+        Page<MailResponseDto> mailListResponseDtoList = createMailListResponseDtoList(memberId, type, pageable);
         return mailListResponseDtoList;
     }
-    private Page<MailResponseDto> createMailListResponseDtoList(Long memberId, String type, Pageable pageable){
-        if(type.equals("ALL")){
+
+    private Page<MailResponseDto> createMailListResponseDtoList(Long memberId, String type, Pageable pageable) {
+        if (type.equals("ALL")) {
             Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdOrderByDateDesc(memberId, pageable);
             return mailHeaderPage.map(mailHeader -> MailResponseDto.of(mailHeader));
 
         }
-        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdAndPlatformTypeOrderByDateDesc(memberId, PlatformType.getEnumPlatformTypeFromStringPlatformType(type),pageable);
+        Page<MailHeader> mailHeaderPage = mailRepository.findAllByMemberIdAndPlatformTypeOrderByDateDesc(memberId, PlatformType.getEnumPlatformTypeFromStringPlatformType(type), pageable);
         return mailHeaderPage.map(mailHeader -> MailResponseDto.of(mailHeader));
     }
+
     public String validateConnect(ValidateRequestDto validateRequestDto) throws MessagingException {
         String validate = validateImap(validateRequestDto);
         return validate;
     }
-    private Member getMember(Long memberId){
+
+    private Member getMember(Long memberId) {
         return memberRepository.findById(memberId).orElse(null);
     }
+
     private String validateImap(ValidateRequestDto validateRequestDto) throws MessagingException {
         try {
             String host = validateRequestDto.getType();
@@ -69,20 +74,22 @@ public class MailManageService {
                 // Handle username or password error
                 // You can log the error message or perform any other necessary actions
                 throw new InvalidValueException(INVALID_EMAIL_ERROR);
-            } if (errorMessage.contains("Please check IMAP/SMTP settings in the webmail")) {
+            }
+            if (errorMessage.contains("Please check IMAP/SMTP settings in the webmail")) {
                 // Handle IMAP/SMTP settings error
                 // You can log the error message or perform any other necessary actions
                 throw new InvalidValueException(IMAP_ERROR);
             }
-            if (errorMessage.contains("Invalid credentials")){
+            if (errorMessage.contains("Invalid credentials")) {
                 throw new InvalidValueException(INVALID_EMAIL_ERROR);
             }
-            if(errorMessage.contains("IMAP access")){
+            if (errorMessage.contains("IMAP access")) {
                 throw new InvalidValueException(IMAP_ERROR);
             }
         }
         return null;
     }
+
     private Store createStore(Properties prop) throws NoSuchProviderException {
         Session session = Session.getInstance(prop);
         Store store = session.getStore("imap");

@@ -14,7 +14,7 @@ public class FilterMailListResponseDto {
     private String type;
     private String keyword;
 
-    public static FilterMailListResponseDto of(MailHeader mailHeader,String keyword){
+    public static FilterMailListResponseDto of(MailHeader mailHeader, String keyword) {
         return FilterMailListResponseDto.builder()
                 .mailId(mailHeader.getId())
                 .title(mailHeader.getTitle())

@@ -14,6 +14,7 @@ public enum PlatformType {
 
 
     private final String stringPlatformType;
+
     public static PlatformType getEnumPlatformTypeFromStringPlatformType(String stringPlatformType) {
         return Arrays.stream(values())
                 .filter(platformType -> platformType.stringPlatformType.equals(stringPlatformType))
