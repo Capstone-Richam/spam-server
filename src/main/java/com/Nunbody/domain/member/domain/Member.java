@@ -6,7 +6,6 @@ import com.Nunbody.global.common.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,8 @@ public class Member extends BaseTimeEntity {
     private String refreshToken;
     @OneToMany(mappedBy = "member")
     @Builder.Default
-    private List<MailHeader> mail= new ArrayList<>();
+    private List<MailHeader> mail = new ArrayList<>();
+
     public void updateRefreshToken(String newRefreshToken) {
         this.refreshToken = newRefreshToken;
     }

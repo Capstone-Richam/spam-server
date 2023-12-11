@@ -10,7 +10,6 @@ import com.Nunbody.domain.Mail.service.MailService;
 import com.Nunbody.global.common.SuccessResponse;
 import com.Nunbody.global.config.auth.MemberId;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -27,37 +26,33 @@ import static com.Nunbody.domain.Mail.domain.PlatformType.NAVER;
 public class MailController {
     private final MailService mailService;
     private final MailManageService mailManageService;
+
     @GetMapping("/mails")
     public ResponseEntity<SuccessResponse<?>> getMail(@MemberId Long memberId, @RequestParam String type) {
         MailList mailList;
 
-        if(PlatformType.getEnumPlatformTypeFromStringPlatformType(type).equals(NAVER)) {
+        if (PlatformType.getEnumPlatformTypeFromStringPlatformType(type).equals(NAVER)) {
             mailList = mailService.getNaverMail(memberId);
-        }
-        else {
+        } else {
             mailList = mailService.getGoogleMail(memberId);
         }
         return SuccessResponse.ok(mailList);
     }
-    /*@GetMapping("/mails")
-    public ResponseEntity<SuccessResponse<?>> getMail(@MemberId Long memberId){
-        MailList mailList;
-        mailList = mailService.getMail(memberId);
 
-        return SuccessResponse.ok(memberId);
-    }*/
     @GetMapping("/header")
-    public ResponseEntity<SuccessResponse<?>> getHeader(@MemberId Long memberId, @RequestParam String type, @PageableDefault Pageable pageable){
-        final Page<MailResponseDto> mailListResponseDtoList = mailManageService.getMailList(memberId,type, pageable);
+    public ResponseEntity<SuccessResponse<?>> getHeader(@MemberId Long memberId, @RequestParam String type, @PageableDefault Pageable pageable) {
+        final Page<MailResponseDto> mailListResponseDtoList = mailManageService.getMailList(memberId, type, pageable);
         return SuccessResponse.ok(mailListResponseDtoList);
     }
+
     @PostMapping("/validate")
     public ResponseEntity<SuccessResponse<?>> validate(@RequestBody ValidateRequestDto validateRequestDto) throws MessagingException {
-        final String string= mailManageService.validateConnect(validateRequestDto);
+        final String string = mailManageService.validateConnect(validateRequestDto);
         return SuccessResponse.ok(string);
     }
+
     @GetMapping("/detail/{id}")
-    public ResponseEntity<SuccessResponse<?>> getMailBody(@PathVariable("id") Long mailId){
+    public ResponseEntity<SuccessResponse<?>> getMailBody(@PathVariable("id") Long mailId) {
         final MailDetailResponseDto mailBody = mailService.getMailBody(mailId);
         return SuccessResponse.ok(mailBody);
     }
