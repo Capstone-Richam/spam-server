@@ -20,9 +20,10 @@ import java.util.List;
 @RequestMapping("/api/filter")
 public class MailFilterController {
     private final FilterService filterService;
+
     @PostMapping
-    public ResponseEntity<SuccessResponse<?>> filtertest(@MemberId Long memberId, @RequestBody FilterKeywordRequest filterKeywordRequest, @PageableDefault Pageable pageable){
-        Page<FilterMailListResponseDto> mailListResponseDtoList = filterService.filterContent(memberId,filterKeywordRequest,pageable);
+    public ResponseEntity<SuccessResponse<?>> filtertest(@MemberId Long memberId, @RequestBody FilterKeywordRequest filterKeywordRequest, @PageableDefault Pageable pageable) {
+        Page<FilterMailListResponseDto> mailListResponseDtoList = filterService.filterContent(memberId, filterKeywordRequest, pageable);
         return SuccessResponse.ok(mailListResponseDtoList);
     }
 

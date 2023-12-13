@@ -13,7 +13,7 @@ public class MailResponseDto {
     private String date;
     private String type;
 
-    public static MailResponseDto of(MailHeader mailHeader){
+    public static MailResponseDto of(MailHeader mailHeader) {
         return MailResponseDto.builder()
                 .mailId(mailHeader.getId())
                 .title(mailHeader.getTitle())

@@ -4,6 +4,7 @@ import com.Nunbody.domain.member.domain.Member;
 import lombok.*;
 
 import javax.persistence.*;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -22,6 +23,7 @@ public class MailMember {
     @ManyToOne
     @JoinColumn(name = "mail_id")
     private MailHeader mailHeader;
+
     public static MailMember createMailMember(Member member, MailHeader mailHeader) {
         return MailMember.builder()
                 .member(member)

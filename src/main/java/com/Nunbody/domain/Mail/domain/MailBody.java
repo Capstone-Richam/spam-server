@@ -1,13 +1,13 @@
 package com.Nunbody.domain.Mail.domain;
 
-import javax.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
-import org.hibernate.annotations.Fetch;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
+
+import javax.persistence.Id;
 
 
 @Data

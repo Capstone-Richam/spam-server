@@ -4,12 +4,6 @@ import com.Nunbody.domain.member.domain.Member;
 import com.mongodb.lang.Nullable;
 import lombok.*;
 
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import lombok.Builder;
 import javax.persistence.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,7 +26,12 @@ public class MailHeader {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
     public void updateTopKeyword(String keyword) {
         this.topKeyword = keyword;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
     }
 }

@@ -3,8 +3,8 @@ package com.Nunbody.domain.member.dto;
 
 import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.token.TokenInfo;
-import lombok.*;
-
+import lombok.Builder;
+import lombok.Getter;
 
 
 @Getter
@@ -15,7 +15,7 @@ public class SignInResponseDto {
     private String accessToken;
     private String refreshToken;
 
-    public static SignInResponseDto of(Member member, TokenInfo tokenInfo){
+    public static SignInResponseDto of(Member member, TokenInfo tokenInfo) {
         return SignInResponseDto.builder()
                 .naverId(member.getNaverId())
                 .gmailId(member.getGmailId())

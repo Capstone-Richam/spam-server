@@ -71,7 +71,11 @@ public class ExceptionHandleFilter extends OncePerRequestFilter {
                             ErrorCode.NAME_EXISTS_ERROR,
                             request, response, "닉네임 중복.", "DEFAULT-ERROR-01"
                     );
-                }
+                }else if(errorMessage.contains("잘못")){setErrorResponse(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        ErrorCode.NAME_ERROR,
+                        request, response, "잘못.", "DEFAULT-ERROR-01"
+                );}
             }
         }
 
