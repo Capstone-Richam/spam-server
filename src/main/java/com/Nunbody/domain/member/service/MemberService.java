@@ -27,6 +27,7 @@ import static com.Nunbody.global.error.ErrorCode.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberService {
     private Logger logger = LoggerFactory.getLogger(MemberService.class);
     private final MemberRepository memberRepository;
