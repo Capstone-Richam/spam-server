@@ -5,7 +5,7 @@ import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.global.common.BaseTimeEntity;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

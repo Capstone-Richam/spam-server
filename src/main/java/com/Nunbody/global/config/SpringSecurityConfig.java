@@ -28,7 +28,7 @@ public class SpringSecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().antMatchers(whiteList);
+        return web -> web.ignoring().requestMatchers(whiteList);
     }
 
     @Bean

@@ -2,9 +2,7 @@ package com.Nunbody.domain.Mail.domain;
 
 import lombok.Builder;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import jakarta.persistence.*;
 
 
 @Builder

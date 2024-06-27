@@ -3,7 +3,7 @@ package com.Nunbody.domain.Mail.domain;
 import com.Nunbody.domain.member.domain.Member;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
