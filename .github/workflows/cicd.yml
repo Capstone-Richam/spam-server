@@ -33,7 +33,6 @@ jobs:
 
       - name: 🍀 gradle build
         run: |
-          cd ./Main
           ./gradlew build -x test
 
       - name: 🍀 docker image build 후 docker hub에 push
