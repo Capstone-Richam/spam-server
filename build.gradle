@@ -39,7 +39,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	//email(javax)
-	implementation 'javax.mail:mail:1.4.7'
+	implementation 'com.sun.mail:javax.mail:1.6.2'
 
 	//DB gradle
 	runtimeOnly 'com.mysql:mysql-connector-j'

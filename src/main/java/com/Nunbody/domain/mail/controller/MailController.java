@@ -31,11 +31,7 @@ public class MailController {
     public ResponseEntity<SuccessResponse<?>> getMail(@MemberId Long memberId, @RequestParam String type) {
         MailList mailList;
 
-        if (PlatformType.getEnumPlatformTypeFromStringPlatformType(type).equals(NAVER)) {
-            mailList = mailService.getNaverMail(memberId);
-        } else {
-            mailList = mailService.getGoogleMail(memberId);
-        }
+            mailList = mailService.getMail(memberId,type);
         return SuccessResponse.ok(mailList);
     }
 
