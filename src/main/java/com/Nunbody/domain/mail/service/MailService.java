@@ -48,7 +48,7 @@ public class MailService {
     private final MemberRepository memberRepository;
     private final Pattern pattern = Pattern.compile("<(.*?)>");
 
-    public MailList getMail(Long memberId, String type) {;
+    public void getMail(Long memberId, String type) {;
         PlatformType platformType =getEnumPlatformTypeFromStringPlatformType(type);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
@@ -69,7 +69,7 @@ public class MailService {
                 throw new IllegalArgumentException("Unsupported platform type");
         }
 
-        return mailSetting(memberId, host, id, password, platformType);
+        mailSetting(memberId, host, id, password, platformType);
     }
 
     @Transactional
