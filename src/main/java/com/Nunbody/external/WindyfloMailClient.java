@@ -1,6 +1,7 @@
 package com.Nunbody.external;
 
 import com.Nunbody.global.config.RestTemplateConfig;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -25,13 +26,14 @@ public class WindyfloMailClient {
 
         return restTemplate.postForObject(FIND_MAIL_URL, request, ConversationQARes.class);
     }
-    public ConversationQARes createMail(String question) {
+    public JsonNode createMail(String question) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         QuestionRequest requestBody = new QuestionRequest(question);
         HttpEntity<QuestionRequest> request = new HttpEntity<>(requestBody, headers);
 
-        return restTemplate.postForObject(CREATE_MAIL_URL, request, ConversationQARes.class);
+        JsonNode ss =  restTemplate.postForObject(CREATE_MAIL_URL, request, JsonNode.class);
+        return ss;
     }
 }
