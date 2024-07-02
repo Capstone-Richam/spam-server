@@ -29,10 +29,9 @@ public class MailController {
 
     @GetMapping("/mails")
     public ResponseEntity<SuccessResponse<?>> getMail(@MemberId Long memberId, @RequestParam String type) {
-        MailList mailList;
 
-            mailList = mailService.getMail(memberId,type);
-        return SuccessResponse.ok(mailList);
+            mailService.getMail(memberId,type);
+        return SuccessResponse.ok(null);
     }
 
     @GetMapping("/header")
