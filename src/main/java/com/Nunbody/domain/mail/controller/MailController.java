@@ -41,8 +41,8 @@ public class MailController {
         return SuccessResponse.ok(mailListResponseDtoList);
     }
     @PostMapping("/send")
-    public ResponseEntity<SuccessResponse<?>> mailSend(@RequestBody EmailReqDto emailReqDto) {
-        emailService.sendMail(emailReqDto);
+    public ResponseEntity<SuccessResponse<?>> mailSend(@MemberId Long memberId, @RequestBody EmailReqDto emailReqDto) {
+        emailService.sendMail(memberId, emailReqDto);
         return SuccessResponse.ok(null);
     }
 
