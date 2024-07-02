@@ -57,7 +57,7 @@ public class GmailController {
 
 
             Store store = session.getStore("imaps");
-            store.connect("imap.gmail.com", "qogustj50@gmail.com", "eqno csrt cmcm xnaa");
+            store.connect("imap.gmail.com", "qogustj50@gmail.com", "");
 
 
             Folder inbox = store.getFolder("INBOX");
