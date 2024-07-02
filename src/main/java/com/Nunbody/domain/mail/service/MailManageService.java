@@ -9,6 +9,7 @@ import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.global.error.exception.InvalidValueException;
+import jakarta.mail.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.*;
 import java.util.Properties;
 
 import static com.Nunbody.global.error.ErrorCode.IMAP_ERROR;
