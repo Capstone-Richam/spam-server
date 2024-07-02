@@ -11,21 +11,20 @@ import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.global.common.EncoderDecoder;
-import com.sun.mail.util.BASE64DecoderStream;
+
+import jakarta.mail.*;
+import jakarta.mail.internet.MimeUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.*;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
