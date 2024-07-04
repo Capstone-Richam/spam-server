@@ -23,16 +23,17 @@ public class WindyfloService {
     public EmailResDto createMail(WindyfloReq windyfloReq) throws IOException {
         EmailResDto emailResDto = new EmailResDto("", "", "");
         while (emailResDto.template().isEmpty() || emailResDto.header().isEmpty() || emailResDto.body().isEmpty()) {
-            ConversationQARes result = windyfloMailClient.findMailInVectorDB(windyfloReq.prompt());
-//            emailResDto = extractEmailTemplate(result.getText());
-            if (result.getText().equals("Hmm, I'm not sure")) {
+//            ConversationQARes result = windyfloMailClient.findMailInVectorDB(windyfloReq.prompt());
+////            emailResDto = extractEmailTemplate(result.getText());
+//            if (result.getText().equals("Hmm, I'm not sure")) {
                 emailResDto = extractEmailTemplate(windyfloMailClient.createMail(windyfloReq.prompt()));
-            }
-            else
-                emailResDto = extractEmailTemplate(result.getText());
-//            System.out.println(result.getText());
+////            }
+//            else
+//                emailResDto = extractEmailTemplate(result.getText());
+////            System.out.println(result.getText());
         }
-        return emailResDto;
+        r.
+                eturn emailResDto;
     }
 
     public EmailResDto extractEmailTemplate(Object input) throws IOException {
