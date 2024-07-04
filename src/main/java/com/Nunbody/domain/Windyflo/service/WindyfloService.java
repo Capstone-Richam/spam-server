@@ -32,8 +32,7 @@ public class WindyfloService {
 //                emailResDto = extractEmailTemplate(result.getText());
 ////            System.out.println(result.getText());
         }
-        r.
-                eturn emailResDto;
+        return emailResDto;
     }
 
     public EmailResDto extractEmailTemplate(Object input) throws IOException {
