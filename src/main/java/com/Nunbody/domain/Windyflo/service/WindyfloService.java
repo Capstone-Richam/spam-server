@@ -24,13 +24,13 @@ public class WindyfloService {
         EmailResDto emailResDto = new EmailResDto("", "", "");
         while (emailResDto.template().isEmpty() || emailResDto.header().isEmpty() || emailResDto.body().isEmpty()) {
 //            ConversationQARes result = windyfloMailClient.findMailInVectorDB(windyfloReq.prompt());
-////            emailResDto = extractEmailTemplate(result.getText());
+//            emailResDto = extractEmailTemplate(result.getText());
 //            if (result.getText().equals("Hmm, I'm not sure")) {
                 emailResDto = extractEmailTemplate(windyfloMailClient.createMail(windyfloReq.prompt()));
-////            }
+//            }
 //            else
 //                emailResDto = extractEmailTemplate(result.getText());
-////            System.out.println(result.getText());
+
         }
         return emailResDto;
     }

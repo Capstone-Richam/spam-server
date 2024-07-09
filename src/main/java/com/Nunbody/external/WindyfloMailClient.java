@@ -13,8 +13,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class WindyfloMailClient {
-    private final String FIND_MAIL_URL = "https://windyflo.com/api/v1/prediction/2eb15033-681a-410b-8577-2b69d8e309d4";
-    private final String CREATE_MAIL_URL = "https://windyflo.com/api/v1/prediction/f66b8ade-2393-4a1a-ae48-a23c258b460a";
+    private final String FIND_MAIL_URL = "https://windyflo.com/api/v1/prediction/05d769b1-0a34-49c5-83d3-6b92c1d650f8";
+    private final String CREATE_MAIL_URL = "https://windyflo.com/api/v1/prediction/fd835f04-0889-4f19-8d97-508901854a76";
     private final RestTemplate restTemplate;
 
     public ConversationQARes findMailInVectorDB(String question) {

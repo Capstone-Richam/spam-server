@@ -68,7 +68,7 @@ public class MailManageService {
             Store store = createStore(prop);
             store.connect(host, id, password);
             return "성공";
-        } catch (AuthenticationFailedException e) {
+        } catch (Exception e) {
             String errorMessage = e.getMessage();
             if (errorMessage.contains("Please check your username, password")) {
                 // Handle username or password error
@@ -84,6 +84,9 @@ public class MailManageService {
                 throw new InvalidValueException(INVALID_EMAIL_ERROR);
             }
             if (errorMessage.contains("IMAP access")) {
+                throw new InvalidValueException(IMAP_ERROR);
+            }
+            if (errorMessage.contains("Couldn't connect to host")) {
                 throw new InvalidValueException(IMAP_ERROR);
             }
         }
