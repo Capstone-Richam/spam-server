@@ -41,7 +41,7 @@ public class MemberService {
 
     public MemberMailIdResDto getMemberMailId(Long memberId){
         Member member = memberReader.getMemberById(memberId);
-        return MemberMailIdResDto.of(member.getNaverId(), member.getGmailId());
+        return MemberMailIdResDto.of(member.getGmailId(), member.getNaverId());
     }
     public void register(MemberRegisterRequestDto resource) {
 
