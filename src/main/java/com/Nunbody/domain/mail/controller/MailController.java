@@ -31,7 +31,7 @@ public class MailController {
     public ResponseEntity<SuccessResponse<?>> getMail(@MemberId Long memberId, @RequestParam String type) {
         MailList mailList;
 
-            mailList = mailService.getMail(memberId,type);
+        mailList = mailService.getMail(memberId,type);
         return SuccessResponse.ok(mailList);
     }
 

@@ -48,7 +48,7 @@ public class MailService {
     private final MemberRepository memberRepository;
     private final Pattern pattern = Pattern.compile("<(.*?)>");
 
-    public MailList getMail(Long memberId, String type) {;
+    public MailList getMail(Long memberId, String type) {
         PlatformType platformType =getEnumPlatformTypeFromStringPlatformType(type);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
@@ -155,13 +155,15 @@ public class MailService {
     public void reset(Message[] messages, Long userId, PlatformType platformType, String platformHost)
             throws MessagingException, IOException {
         List<MailBody> mailBodies = new ArrayList<>();
+        List<MailHeader> mailHeaders = new ArrayList<>();
         int startIndex = Math.max(0, messages.length - 20);
 
         for (int i = startIndex; i < messages.length; i++) {
             MailHeader mailHeader = createMailHeader(messages[i], userId, platformType);
-            mailRepository.save(mailHeader);
+            mailHeaders.add(mailHeader);
             mailBodies.add(extractMailBody(platformHost, messages[i], mailHeader.getId()));
         }
+        mailRepository.saveAll(mailHeaders);
         mongoTemplate.insertAll(mailBodies);
     }
 
