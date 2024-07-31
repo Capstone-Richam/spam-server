@@ -100,7 +100,7 @@ public class MailService {
         return mailList;
     }
 
-    private Store connectToMailStore(String host, String username, String password) throws MessagingException {
+    public Store connectToMailStore(String host, String username, String password) throws MessagingException {
         Properties props = new Properties();
         props.setProperty("mail.store.protocol", "imaps");
         props.setProperty("mail.imaps.host", host);
