@@ -39,7 +39,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	//email(javax)
-	implementation 'com.sun.mail:javax.mail:1.6.2'
+//	implementation 'com.sun.mail:javax.mail:1.6.2'
 
 	//DB gradle
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -51,6 +51,9 @@ dependencies {
 	//jsoup
 
 	implementation 'org.jsoup:jsoup:1.17.1'
+
+	//email
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

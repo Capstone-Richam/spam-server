@@ -9,6 +9,7 @@ import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.global.error.exception.InvalidValueException;
+import jakarta.mail.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.*;
 import java.util.Properties;
 
 import static com.Nunbody.global.error.ErrorCode.IMAP_ERROR;
@@ -68,7 +68,7 @@ public class MailManageService {
             Store store = createStore(prop);
             store.connect(host, id, password);
             return "성공";
-        } catch (AuthenticationFailedException e) {
+        } catch (Exception e) {
             String errorMessage = e.getMessage();
             if (errorMessage.contains("Please check your username, password")) {
                 // Handle username or password error
@@ -84,6 +84,9 @@ public class MailManageService {
                 throw new InvalidValueException(INVALID_EMAIL_ERROR);
             }
             if (errorMessage.contains("IMAP access")) {
+                throw new InvalidValueException(IMAP_ERROR);
+            }
+            if (errorMessage.contains("Couldn't connect to host")) {
                 throw new InvalidValueException(IMAP_ERROR);
             }
         }

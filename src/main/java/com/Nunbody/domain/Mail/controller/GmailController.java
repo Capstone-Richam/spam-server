@@ -2,20 +2,23 @@ package com.Nunbody.domain.Mail.controller;
 
 import com.Nunbody.domain.Mail.domain.MailBody;
 import com.Nunbody.domain.Mail.domain.MailHeader;
-import com.Nunbody.domain.Mail.domain.MailList;
 import com.Nunbody.domain.Mail.domain.PlatformType;
+import com.Nunbody.domain.Mail.repository.MailBodyRepository;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.Nunbody.domain.member.repository.MemberRepository;
+import jakarta.mail.*;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimeUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
+//import javax.mail.*;
+//import javax.mail.internet.MimeMultipart;
+//import javax.mail.internet.MimeUtility;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -37,10 +40,12 @@ public class GmailController {
     private static String platformHost ="imap.gmail.com";
     private final Pattern pattern = Pattern.compile("<(.*?)>");
     private final MemberRepository memberRepository;
+    private final MailBodyRepository mailBodyRepository;
+    public static List<MailBody> mailBodies = new ArrayList<>();
     @GetMapping("/gmail")
-    public MailList getGmailMessages() {
-        List<MailBody> mailBodies = new ArrayList<>();
-        MailList mailList = MailList.builder().memberId(userId).build();
+    public ResponseEntity<?> getGmailMessages() throws MessagingException, IOException {
+
+//        MailList mailList = MailList.builder().memberId(userId).build();
         Properties props = new Properties();
         props.setProperty("mail.store.protocol", "imaps");
         props.setProperty("mail.imaps.host", "imap.gmail.com");
@@ -53,32 +58,28 @@ public class GmailController {
         Session session = Session.getInstance(props);
         StringBuilder result = new StringBuilder();
 
-        try {
+
             Store store = session.getStore("imaps");
-            store.connect("imap.gmail.com", "qogustj50@gmail.com", "eqno csrt cmcm xnaa");
+            store.connect("imap.gmail.com", "qogustj50@gmail.com", "");
 
 
             Folder inbox = store.getFolder("INBOX");
             inbox.open(Folder.READ_ONLY);
 
-            Message[] messages = inbox.getMessages(1, 10); // 최근 10개 메일 가져오기
+            Message[] messages = inbox.getMessages(1, 9); // 최근 10개 메일 가져오기
 
             MailHeader latestMail = mailRepository.findFirstByMemberIdAndPlatformTypeOrderByDateDesc(userId, platformType).orElse(null);
 
-            if (latestMail == null) {
-                reset(messages, userId, platformType, platformHost);
-            } else {
+//            if (latestMail == null) {
+//                reset(messages, userId, platformType, platformHost);
+//            } else {
                 processNewMails(messages, userId, platformType, platformHost, latestMail, mailBodies);
-            }
+//            }
 
-            mongoTemplate.insertAll(mailBodies);
+//            mongoTemplate.insertAll(mailBodies);
+mailBodyRepository.saveAll(mailBodies);
 
-        } catch (Exception e) {
-//            log.error("Error in mailSetting", e);
-            throw new RuntimeException("Failed to process emails", e);
-        }
-
-        return mailList;
+        return ResponseEntity.ok(null);
     }
     @Transactional
     public void reset(Message[] messages, Long userId, PlatformType platformType, String platformHost)
@@ -95,20 +96,20 @@ public class GmailController {
     }
     private void processNewMails(Message[] messages, Long userId, PlatformType platformType, String platformHost,
                                  MailHeader latestMail, List<MailBody> mailBodies) throws MessagingException, IOException {
-        LocalDateTime latestMailDate = LocalDateTime.parse(latestMail.getDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//        LocalDateTime latestMailDate = LocalDateTime.parse(latestMail.getDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         ZoneId seoulZone = ZoneId.of("Asia/Seoul");
 
         for (int i = messages.length - 1; i >= 0; i--) {
             Message message = messages[i];
             LocalDateTime messageDate = LocalDateTime.ofInstant(message.getReceivedDate().toInstant(), seoulZone);
 
-            if (messageDate.isAfter(latestMailDate)) {
+//            if (!messageDate.isAfter(latestMailDate)) {
                 MailHeader mailHeader = createMailHeader(message, userId, platformType);
                 mailRepository.save(mailHeader);
                 mailBodies.add(extractMailBody(platformHost, message, mailHeader.getId()));
-            } else {
-                break;  // No need to check older messages
-            }
+//            } else {
+//                break;  // No need to check older messages
+//            }
         }
     }
     private String handleMultipart(Multipart multipart) throws MessagingException, IOException {
