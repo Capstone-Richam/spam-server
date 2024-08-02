@@ -4,6 +4,7 @@ import com.Nunbody.domain.member.domain.Keyword;
 import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.domain.member.dto.MemberRegisterRequestDto;
 import com.Nunbody.domain.member.dto.SignInResponseDto;
+import com.Nunbody.domain.member.dto.res.MemberMailIdResDto;
 import com.Nunbody.domain.member.repository.KeywordRepository;
 import com.Nunbody.domain.member.repository.MemberRepository;
 import com.Nunbody.global.common.EncoderDecoder;
@@ -35,8 +36,13 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final OAuthService oAuthService;
+    private final MemberReader memberReader;
 
 
+    public MemberMailIdResDto getMemberMailId(Long memberId){
+        Member member = memberReader.getMemberById(memberId);
+        return MemberMailIdResDto.of(member.getGmailId(), member.getNaverId());
+    }
     public void register(MemberRegisterRequestDto resource) {
 
         Member member;

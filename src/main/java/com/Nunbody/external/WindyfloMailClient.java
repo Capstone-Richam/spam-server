@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class WindyfloMailClient {
     private final String FIND_MAIL_URL = "https://windyflo.com/api/v1/prediction/05d769b1-0a34-49c5-83d3-6b92c1d650f8";
-    private final String CREATE_MAIL_URL = "https://windyflo.com/api/v1/prediction/fd835f04-0889-4f19-8d97-508901854a76";
+    private final String CREATE_MAIL_URL = "https://windyflo.com/api/v1/prediction/85b9eb4a-e94c-4e98-ab4f-ed805bba1220";
     private final RestTemplate restTemplate;
 
     public ConversationQARes findMailInVectorDB(String question) {
