@@ -82,7 +82,7 @@ public class MailScheduleService {
         return "Unable to extract content";
     }
 
-    private String getTextFromMultipart(Multipart multipart) throws MessagingException, IOException {
+    public String getTextFromMultipart(Multipart multipart) throws MessagingException, IOException {
         StringBuilder result = new StringBuilder();
         int count = multipart.getCount();
         for (int i = 0; i < count; i++) {
