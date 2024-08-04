@@ -1,11 +1,14 @@
 package com.Nunbody.domain.Kakao.service;
 
+import com.Nunbody.domain.Kakao.service.dto.DefaultMessageDto;
 import com.Nunbody.domain.Mail.domain.MailHeader;
 import com.Nunbody.domain.Mail.domain.PlatformType;
 import com.Nunbody.domain.Mail.repository.MailRepository;
 import com.Nunbody.domain.Mail.service.MailService;
 import com.Nunbody.domain.member.domain.Member;
 import com.Nunbody.domain.member.service.MemberReader;
+import com.Nunbody.external.WindyfloMailClient;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.mail.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,33 +32,41 @@ public class MailScheduleService {
     private final MailService mailService;
     private final MemberReader memberReader;
     private final MailRepository mailRepository;
+    private final WindyfloMailClient windyfloMailClient;
+    private final KakaoService kakaoService;
 
-
-    public List<String> checkNewMailsAndGetContent(Long userId, String platformHost, String platformId, String platformPassword, PlatformType platformType) {
+    public List<String> checkNewMailsAndGetContent(Member member, String platformHost, String platformId, String platformPassword, PlatformType platformType) {
         List<String> newMailContents = new ArrayList<>();
 
         try (Store store = mailService.connectToMailStore(platformHost, platformId, platformPassword);
              Folder folder = store.getFolder("inbox")) {
 
             folder.open(Folder.READ_ONLY);
+            int lastMessageIndex = folder.getMessageCount(); // 가장 최근 메일의 인덱스
+            Message message = folder.getMessage(lastMessageIndex);
+            Object object = message.getContent();
 
-            // 최근 3개의 메일만 가져옵니다.
-            int messageCount = folder.getMessageCount();
-            int startIndex = Math.max(1, messageCount - 2);
-            Message[] messages = folder.getMessages(startIndex, messageCount);
-
-            // 가장 최근에 저장된 메일의 날짜를 가져옵니다.
-            String latestStoredDate = mailRepository.findFirstByMemberIdAndPlatformTypeOrderByDateDesc(userId, platformType)
+            String st = "";
+            if (object instanceof String) {
+                st = (String) object;
+            } else if (object instanceof Multipart) {
+                st = getTextFromMultipart((Multipart) message.getContent());
+            }
+            String latestStoredDate = mailRepository.findFirstByMemberIdAndPlatformTypeOrderByDateDesc(member.getId(), platformType)
                     .map(MailHeader::getDate)
                     .orElse(String.valueOf(new Date(0))); // 저장된 메일이 없으면 1970년 1월 1일로 설정
 
-            for (Message message : messages) {
-                Date messageDate = message.getReceivedDate();
-                if (messageDate.after(parseDate(latestStoredDate))) {
-                    String content = getMessageContent(message);
-                    newMailContents.add(content);
+            Date messageDate = message.getReceivedDate();
+            if (messageDate.after(parseDate(latestStoredDate))) {
+                st = getMessageContent(message);
                 }
+            else{
+                return null;
             }
+            JsonNode jsonNode = windyfloMailClient.summaryMail(st);
+            DefaultMessageDto myMsg = DefaultMessageDto.of("text", jsonNode.get("text").asText() +" 이메일이 도착했어요 확인해주세요","https://www.richam.site/login","https://www.richam.site/","메일 확인하러가기");
+
+            kakaoService.sendMessage(member.getAccessToken(), myMsg);
 
         } catch (Exception e) {
 //            log.error("Error in checkNewMailsAndGetContent for user: " + userId, e);
@@ -105,7 +116,7 @@ public class MailScheduleService {
         for (Member member : users) {
             try {
                 List<String> newMailContents = checkNewMailsAndGetContent(
-                        member.getId(),
+                        member,
                         "imap.naver.com",
                         member.getNaverId(),
                         member.getNaverPassword(),

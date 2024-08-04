@@ -27,7 +27,7 @@ public class Member extends BaseTimeEntity {
     private String naverPassword;
     private String gmailId;
     private String gmailPassword;
-
+    private String accessToken;
     private String refreshToken;
     @OneToMany(mappedBy = "member")
     @Builder.Default
@@ -36,5 +36,7 @@ public class Member extends BaseTimeEntity {
     public void updateRefreshToken(String newRefreshToken) {
         this.refreshToken = newRefreshToken;
     }
-
+    public void updateAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
 }

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.mail.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,9 +26,12 @@ public class MessageService {
     private final MemberReader memberReader;
     private final MailService mailService;
     private final MailScheduleService mailScheduleService;
+    @Transactional
     public boolean sendMyMessage(Long memberId, String code) throws IOException, MessagingException {
         String accessToken = kakaoService.getAuthToken(code);
+
         Member member = memberReader.getMemberById(memberId);
+        member.updateAccessToken(accessToken);
         Store store = mailService.connectToMailStore("imap.naver.com", member.getNaverId(), EncoderDecoder.decodeFromBase64(member.getNaverPassword()));
 
         Folder folder = store.getFolder("inbox");
