@@ -29,7 +29,7 @@ public class HealthCheckApiController {
     private static final String KAKAO_AUTH_ENDPOINT = "https://kauth.kakao.com/oauth/authorize";
 
     @GetMapping("/oauth/kakao")
-    public void kakaoOauth(HttpServletResponse response) throws IOException {
+    public String kakaoOauth(HttpServletResponse response) throws IOException {
         String scope = "talk_message,friends"; // 카카오톡 메시지 전송과 친구 목록 접근을 위한 scope
 
         String authUrl = KAKAO_AUTH_ENDPOINT +
@@ -39,6 +39,7 @@ public class HealthCheckApiController {
                 "&scope=" + scope;
 
         response.sendRedirect(authUrl);
+        return response.encodeRedirectURL(authUrl);
     }
     @GetMapping("/kakao-login")
     public ResponseEntity<Map<String, String>> initiateKakaoLogin() {
