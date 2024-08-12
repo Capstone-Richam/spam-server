@@ -24,7 +24,7 @@ public class SpringSecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtTokenProvider tokenProvider;
     private final CorsConfig corsConfig;
-    private static final String[] whiteList = {"/api/member/signup", "/api/member/signin", "/api/member/validate", "/api/mail/validate","/gmail"};
+    private static final String[] whiteList = {"/api/member/signup", "/api/member/signin", "/api/member/validate", "/api/mail/validate","/gmail", "/oauth/kakao","/kakao-login"};
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

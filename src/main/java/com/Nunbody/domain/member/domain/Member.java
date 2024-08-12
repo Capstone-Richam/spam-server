@@ -6,7 +6,10 @@ import com.Nunbody.global.common.BaseTimeEntity;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,8 +30,9 @@ public class Member extends BaseTimeEntity {
     private String naverPassword;
     private String gmailId;
     private String gmailPassword;
-
+    private String accessToken;
     private String refreshToken;
+    private Date lastTime;
     @OneToMany(mappedBy = "member")
     @Builder.Default
     private List<MailHeader> mail = new ArrayList<>();
@@ -36,5 +40,10 @@ public class Member extends BaseTimeEntity {
     public void updateRefreshToken(String newRefreshToken) {
         this.refreshToken = newRefreshToken;
     }
-
+    public void updateAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+    public void updateLastTime(Date lastTime) {
+        this.lastTime = lastTime;
+    }
 }
